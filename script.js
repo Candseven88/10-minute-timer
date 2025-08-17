@@ -273,11 +273,11 @@ document.addEventListener('DOMContentLoaded', () => {
             title: '倒计时器',
             taskName: `任务 ${taskIndex + 1}`,
             footer: '专注工作，高效生活',
-            backgroundType: 'color', // 背景类型：color, image, video
+            backgroundType: 'color', // 背景类型：color, image
             backgroundColor: '#000000', // 背景颜色
             backgroundImage: '', // 背景图片URL
-            backgroundVideo: '', // 背景视频URL
-            backgroundEnabled: true // 背景是否启用
+            backgroundEnabled: true, // 背景是否启用
+            backgroundImageOpacity: 80 // 图片背景透明度
         };
         return `
             <div class="task-section" data-task-index="${taskIndex}">
@@ -317,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <select id="background-type-${taskIndex}" onchange="updateBackgroundSettings(${taskIndex})">
                                 <option value="color" ${taskData.backgroundType === 'color' ? 'selected' : ''}>纯色背景</option>
                                 <option value="image" ${taskData.backgroundType === 'image' ? 'selected' : ''}>图片背景</option>
-                                <option value="video" ${taskData.backgroundType === 'video' ? 'selected' : ''}>视频背景</option>
                             </select>
                         </div>
                         
@@ -325,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="background-color-setting" id="background-color-setting-${taskIndex}" style="display: ${taskData.backgroundType === 'color' ? 'block' : 'none'}">
                             <div class="setting-group">
                                 <label for="background-color-${taskIndex}">背景颜色</label>
-                                <input type="color" id="background-color-${taskIndex}" value="${taskData.backgroundColor}">
+                                <input type="color" id="background-color-${taskIndex}" value="${taskData.backgroundColor}" onchange="updateTaskPreview(${taskIndex})">
                             </div>
                         </div>
                         
@@ -333,33 +332,33 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="background-image-setting" id="background-image-setting-${taskIndex}" style="display: ${taskData.backgroundType === 'image' ? 'block' : 'none'}">
                             <div class="setting-group">
                                 <label for="background-image-${taskIndex}">图片URL</label>
-                                <input type="url" id="background-image-${taskIndex}" value="${taskData.backgroundImage}" placeholder="https://example.com/image.jpg">
+                                <input type="url" id="background-image-${taskIndex}" value="${taskData.backgroundImage}" placeholder="https://example.com/image.jpg" onchange="updateTaskPreview(${taskIndex})">
                             </div>
                             <div class="setting-group">
                                 <label for="background-image-file-${taskIndex}">或上传图片</label>
-                                <input type="file" id="background-image-file-${taskIndex}" accept="image/*" onchange="handleImageUpload(${taskIndex})">
+                                <div class="file-upload-container">
+                                    <input type="file" id="background-image-file-${taskIndex}" accept="image/*" onchange="handleImageUpload(${taskIndex})">
+                                    <button type="button" class="clear-file-btn" onclick="clearImageFile(${taskIndex})" title="清除已上传的图片">×</button>
+                                </div>
+                                <div class="file-status" id="image-file-status-${taskIndex}"></div>
                             </div>
                             <div class="setting-group">
-                                <label for="background-image-opacity-${taskIndex}">透明度</label>
-                                <input type="range" id="background-image-opacity-${taskIndex}" min="0" max="100" value="80" oninput="updateImageOpacityPreview(${taskIndex})">
-                                <span class="opacity-value" id="opacity-value-${taskIndex}">80%</span>
+                                <label for="background-image-opacity-${taskIndex}">蒙版透明度</label>
+                                <input type="range" id="background-image-opacity-${taskIndex}" min="0" max="100" value="${taskData.backgroundImageOpacity || 80}" oninput="updateImageOpacityPreview(${taskIndex}); updateTaskPreview(${taskIndex})">
+                                <span class="opacity-value" id="opacity-value-${taskIndex}">${taskData.backgroundImageOpacity || 80}%</span>
                             </div>
                         </div>
                         
-                        <!-- 视频背景设置 -->
-                        <div class="background-video-setting" id="background-video-setting-${taskIndex}" style="display: ${taskData.backgroundType === 'video' ? 'block' : 'none'}">
-                            <div class="setting-group">
-                                <label for="background-video-${taskIndex}">视频URL</label>
-                                <input type="url" id="background-video-${taskIndex}" value="${taskData.backgroundVideo}" placeholder="https://example.com/video.mp4">
-                            </div>
-                            <div class="setting-group">
-                                <label for="background-video-file-${taskIndex}">或上传视频</label>
-                                <input type="file" id="background-video-file-${taskIndex}" accept="video/*" onchange="handleVideoUpload(${taskIndex})">
-                            </div>
-                            <div class="setting-group">
-                                <label for="background-video-opacity-${taskIndex}">透明度</label>
-                                <input type="range" id="background-video-opacity-${taskIndex}" min="0" max="100" value="80" oninput="updateVideoOpacityPreview(${taskIndex})">
-                                <span class="opacity-value" id="video-opacity-value-${taskIndex}">80%</span>
+                        <!-- 实时效果预览 -->
+                        <div class="task-preview-section">
+                            <h4>效果预览</h4>
+                            <div class="task-preview-container" id="task-preview-${taskIndex}">
+                                <div class="task-preview-timer">
+                                    <h3>${taskData.title}</h3>
+                                    <div class="task-preview-task-name">${taskData.taskName}</div>
+                                    <div class="task-preview-time">00:00:05</div>
+                                    <div class="task-preview-footer">${taskData.footer}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -401,8 +400,8 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundType: 'color', // 默认背景类型
             backgroundColor: '#000000', // 默认背景颜色
             backgroundImage: '', // 默认背景图片
-            backgroundVideo: '', // 默认背景视频
-            backgroundEnabled: true // 默认启用背景
+            backgroundEnabled: true, // 默认启用背景
+            backgroundImageOpacity: 80 // 默认图片背景透明度
         };
         tasks.push(newTask);
         
@@ -460,8 +459,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundType: 'color', // 默认背景类型
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
-                backgroundVideo: '', // 默认背景视频
-                backgroundEnabled: true // 默认启用背景
+                backgroundEnabled: true, // 默认启用背景
+                backgroundImageOpacity: 80 // 默认图片背景透明度
             }];
         } else {
             // 默认设置
@@ -477,8 +476,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     backgroundType: 'color', // 默认背景类型
                     backgroundColor: '#000000', // 默认背景颜色
                     backgroundImage: '', // 默认背景图片
-                    backgroundVideo: '', // 默认背景视频
-                    backgroundEnabled: true // 默认启用背景
+                    backgroundEnabled: true, // 默认启用背景
+                    backgroundImageOpacity: 80 // 默认图片背景透明度
                 },
                 { 
                     days: 0, 
@@ -491,8 +490,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     backgroundType: 'color', // 默认背景类型
                     backgroundColor: '#000000', // 默认背景颜色
                     backgroundImage: '', // 默认背景图片
-                    backgroundVideo: '', // 默认背景视频
-                    backgroundEnabled: true // 默认启用背景
+                    backgroundEnabled: true, // 默认启用背景
+                    backgroundImageOpacity: 80 // 默认图片背景透明度
                 }
             ];
         }
@@ -520,19 +519,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const backgroundType = section.querySelector(`#background-type-${index}`).value;
             let backgroundColor = '#000000'; // 默认颜色
             let backgroundImage = '';
-            let backgroundVideo = '';
+            let backgroundImageOpacity = 80; // 默认透明度
 
             if (backgroundEnabled) {
                 if (backgroundType === 'color') {
                     backgroundColor = section.querySelector(`#background-color-${index}`).value;
                 } else if (backgroundType === 'image') {
                     backgroundImage = section.querySelector(`#background-image-${index}`).value;
-                } else if (backgroundType === 'video') {
-                    backgroundVideo = section.querySelector(`#background-video-${index}`).value;
+                    backgroundImageOpacity = parseInt(section.querySelector(`#background-image-opacity-${index}`).value) || 80;
                 }
             }
 
-            newTasks.push({ days, hours, minutes, seconds, title, taskName, footer, backgroundType, backgroundColor, backgroundImage, backgroundVideo, backgroundEnabled });
+            newTasks.push({ days, hours, minutes, seconds, title, taskName, footer, backgroundType, backgroundColor, backgroundImage, backgroundEnabled, backgroundImageOpacity });
         });
         
         const settings = { tasks: newTasks };
@@ -551,7 +549,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Show success message
-        alert('设置已保存！点击开始按钮开始执行任务');
+        const savedTasksCount = newTasks.length;
+        const message = `设置已保存！\n\n已配置 ${savedTasksCount} 个任务：\n`;
+        let taskDetails = '';
+        
+        newTasks.forEach((task, index) => {
+            const backgroundInfo = task.backgroundEnabled ? 
+                `背景: ${task.backgroundType === 'color' ? '纯色' : '图片'}` : 
+                '背景: 未启用';
+            taskDetails += `• 任务 ${index + 1}: "${task.title}" (${task.taskName}) - ${backgroundInfo}\n`;
+        });
+        
+        alert(message + taskDetails + '\n点击开始按钮开始执行任务');
     }
 
     // Apply settings to inputs
@@ -568,8 +577,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundType: 'color', // 默认背景类型
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
-                backgroundVideo: '', // 默认背景视频
-                backgroundEnabled: true // 默认启用背景
+                backgroundEnabled: true, // 默认启用背景
+                backgroundImageOpacity: 80 // 默认图片背景透明度
             }];
         }
         
@@ -593,8 +602,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundType: 'color', // 默认背景类型
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
-                backgroundVideo: '', // 默认背景视频
-                backgroundEnabled: true // 默认启用背景
+                backgroundEnabled: true, // 默认启用背景
+                backgroundImageOpacity: 80 // 默认图片背景透明度
             },
             { 
                 days: 0, 
@@ -607,8 +616,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundType: 'color', // 默认背景类型
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
-                backgroundVideo: '', // 默认背景视频
-                backgroundEnabled: true // 默认启用背景
+                backgroundEnabled: true, // 默认启用背景
+                backgroundImageOpacity: 80 // 默认图片背景透明度
             }
         ];
         
@@ -1050,16 +1059,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // 隐藏所有背景设置区域
         document.getElementById(`background-color-setting-${taskIndex}`).style.display = 'none';
         document.getElementById(`background-image-setting-${taskIndex}`).style.display = 'none';
-        document.getElementById(`background-video-setting-${taskIndex}`).style.display = 'none';
         
         // 显示对应的背景设置区域
         if (backgroundType === 'color') {
             document.getElementById(`background-color-setting-${taskIndex}`).style.display = 'block';
         } else if (backgroundType === 'image') {
             document.getElementById(`background-image-setting-${taskIndex}`).style.display = 'block';
-        } else if (backgroundType === 'video') {
-            document.getElementById(`background-video-setting-${taskIndex}`).style.display = 'block';
         }
+        
+        // 更新预览
+        updateTaskPreview(taskIndex);
     };
 
     // 切换背景设置启用/禁用
@@ -1070,40 +1079,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (backgroundEnabledCheckbox && backgroundOptions) {
             // 根据勾选框的当前状态显示或隐藏背景选项
             backgroundOptions.style.display = backgroundEnabledCheckbox.checked ? 'block' : 'none';
-        }
-    };
-
-    // 处理图片上传
-    window.handleImageUpload = function(taskIndex) {
-        const fileInput = document.getElementById(`background-image-file-${taskIndex}`);
-        const imageUrlInput = document.getElementById(`background-image-${taskIndex}`);
-        const imageOpacityInput = document.getElementById(`background-image-opacity-${taskIndex}`);
-        const opacityValueSpan = document.getElementById(`opacity-value-${taskIndex}`);
-
-        if (fileInput.files.length > 0) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imageUrlInput.value = e.target.result;
-                updateImageOpacityPreview(taskIndex); // 更新透明度预览
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-    };
-
-    // 处理视频上传
-    window.handleVideoUpload = function(taskIndex) {
-        const fileInput = document.getElementById(`background-video-file-${taskIndex}`);
-        const videoUrlInput = document.getElementById(`background-video-${taskIndex}`);
-        const videoOpacityInput = document.getElementById(`background-video-opacity-${taskIndex}`);
-        const opacityValueSpan = document.getElementById(`video-opacity-value-${taskIndex}`);
-
-        if (fileInput.files.length > 0) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                videoUrlInput.value = e.target.result;
-                updateVideoOpacityPreview(taskIndex); // 更新透明度预览
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+            // 更新预览
+            updateTaskPreview(taskIndex);
         }
     };
 
@@ -1113,10 +1090,123 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(`opacity-value-${taskIndex}`).textContent = opacity + '%';
     };
 
-    // 更新视频透明度预览
-    window.updateVideoOpacityPreview = function(taskIndex) {
-        const opacity = document.getElementById(`background-video-opacity-${taskIndex}`).value;
-        document.getElementById(`video-opacity-value-${taskIndex}`).textContent = opacity + '%';
+    // 更新任务预览
+    window.updateTaskPreview = function(taskIndex) {
+        const previewContainer = document.getElementById(`task-preview-${taskIndex}`);
+        if (!previewContainer) return;
+        
+        // 获取当前设置值
+        const backgroundEnabled = document.getElementById(`background-enabled-${taskIndex}`).checked;
+        const backgroundType = document.getElementById(`background-type-${taskIndex}`).value;
+        const title = document.getElementById(`title-input-${taskIndex}`).value || '倒计时器';
+        const taskName = document.getElementById(`taskname-input-${taskIndex}`).value || `任务 ${taskIndex + 1}`;
+        const footer = document.getElementById(`footer-input-${taskIndex}`).value || '专注工作，高效生活';
+        
+        // 更新预览内容
+        const previewTimer = previewContainer.querySelector('.task-preview-timer');
+        if (previewTimer) {
+            previewTimer.querySelector('h3').textContent = title;
+            previewTimer.querySelector('.task-preview-task-name').textContent = taskName;
+            previewTimer.querySelector('.task-preview-footer').textContent = footer;
+        }
+        
+        // 清除之前的背景
+        previewContainer.style.background = '';
+        previewContainer.style.backgroundImage = '';
+        previewContainer.style.backgroundSize = '';
+        previewContainer.style.backgroundPosition = '';
+        previewContainer.style.backgroundRepeat = '';
+        
+        // 移除之前的视频背景和蒙版
+        const existingVideo = previewContainer.querySelector('.background-video');
+        if (existingVideo) {
+            existingVideo.remove();
+        }
+        const existingOverlay = previewContainer.querySelector('.background-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        
+        // 应用背景设置
+        if (backgroundEnabled) {
+            if (backgroundType === 'color') {
+                const backgroundColor = document.getElementById(`background-color-${taskIndex}`).value;
+                previewContainer.style.backgroundColor = backgroundColor;
+            } else if (backgroundType === 'image') {
+                const backgroundImage = document.getElementById(`background-image-${taskIndex}`).value;
+                const opacity = document.getElementById(`background-image-opacity-${taskIndex}`).value;
+                
+                if (backgroundImage) {
+                    previewContainer.style.backgroundImage = `url('${backgroundImage}')`;
+                    previewContainer.style.backgroundSize = 'cover';
+                    previewContainer.style.backgroundPosition = 'center';
+                    previewContainer.style.backgroundRepeat = 'no-repeat';
+                    
+                    // 添加蒙版
+                    const overlay = document.createElement('div');
+                    overlay.className = 'background-overlay';
+                    overlay.style.cssText = `
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(0, 0, 0, ${1 - opacity / 100});
+                        z-index: 0;
+                        pointer-events: none;
+                    `;
+                    previewContainer.style.position = 'relative';
+                    previewContainer.appendChild(overlay);
+                    
+                    // 确保文字内容在蒙版之上
+                    const textElements = previewContainer.querySelectorAll('h3, .task-preview-task-name, .task-preview-time, .task-preview-footer');
+                    textElements.forEach(element => {
+                        element.style.position = 'relative';
+                        element.style.zIndex = '1';
+                    });
+                }
+            }
+        } else {
+            // 如果背景未启用，使用默认黑色背景
+            previewContainer.style.backgroundColor = '#000000';
+        }
+    };
+
+    // 处理图片上传
+    window.handleImageUpload = function(taskIndex) {
+        const fileInput = document.getElementById(`background-image-file-${taskIndex}`);
+        const imageUrlInput = document.getElementById(`background-image-${taskIndex}`);
+        const imageFileStatus = document.getElementById(`image-file-status-${taskIndex}`);
+        
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            imageFileStatus.textContent = '正在处理图片...';
+            imageFileStatus.style.color = '#007bff';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageUrlInput.value = e.target.result;
+                imageFileStatus.textContent = `已上传: ${file.name}`;
+                imageFileStatus.style.color = '#28a745';
+                updateImageOpacityPreview(taskIndex);
+                updateTaskPreview(taskIndex);
+            };
+            reader.onerror = function() {
+                imageFileStatus.textContent = '图片处理失败';
+                imageFileStatus.style.color = '#dc3545';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // 清除图片文件
+    window.clearImageFile = function(taskIndex) {
+        const imageUrlInput = document.getElementById(`background-image-${taskIndex}`);
+        const imageFileStatus = document.getElementById(`image-file-status-${taskIndex}`);
+        imageUrlInput.value = '';
+        imageFileStatus.textContent = '已清除';
+        imageFileStatus.style.color = 'red';
+        updateTaskPreview(taskIndex);
     };
 
     // 应用背景到倒计时容器
@@ -1134,10 +1224,14 @@ document.addEventListener('DOMContentLoaded', () => {
             timerContainer.style.backgroundPosition = '';
             timerContainer.style.backgroundRepeat = '';
             
-            // 移除之前的视频背景
+            // 移除之前的视频背景和蒙版
             const existingVideo = timerContainer.querySelector('.background-video');
             if (existingVideo) {
                 existingVideo.remove();
+            }
+            const existingOverlay = timerContainer.querySelector('.background-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
             }
             
             // 只在背景启用时应用背景
@@ -1151,27 +1245,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     timerContainer.style.backgroundSize = 'cover';
                     timerContainer.style.backgroundPosition = 'center';
                     timerContainer.style.backgroundRepeat = 'no-repeat';
-                } else if (currentTask.backgroundType === 'video' && currentTask.backgroundVideo) {
-                    // 应用视频背景
-                    const video = document.createElement('video');
-                    video.className = 'background-video';
-                    video.src = currentTask.backgroundVideo;
-                    video.autoplay = true;
-                    video.muted = true;
-                    video.loop = true;
-                    video.playsInline = true;
-                    video.style.cssText = `
+                    
+                    // 添加蒙版
+                    const overlay = document.createElement('div');
+                    overlay.className = 'background-overlay';
+                    overlay.style.cssText = `
                         position: absolute;
                         top: 0;
                         left: 0;
                         width: 100%;
                         height: 100%;
-                        object-fit: cover;
-                        z-index: -1;
-                        opacity: 0.8;
+                        background-color: rgba(0, 0, 0, ${1 - (currentTask.backgroundImageOpacity || 80) / 100});
+                        z-index: 0;
+                        pointer-events: none;
                     `;
                     timerContainer.style.position = 'relative';
-                    timerContainer.appendChild(video);
+                    timerContainer.appendChild(overlay);
+                    
+                    // 确保文字内容在蒙版之上
+                    const textElements = timerContainer.querySelectorAll('h1, .current-task-indicator, .timer-display, .timer-footer');
+                    textElements.forEach(element => {
+                        element.style.position = 'relative';
+                        element.style.zIndex = '1';
+                    });
                 }
             } else {
                 // 如果背景未启用，使用默认黑色背景
@@ -1195,10 +1291,14 @@ document.addEventListener('DOMContentLoaded', () => {
             previewContainer.style.backgroundPosition = '';
             previewContainer.style.backgroundRepeat = '';
             
-            // 移除之前的视频背景
+            // 移除之前的视频背景和蒙版
             const existingVideo = previewContainer.querySelector('.background-video');
             if (existingVideo) {
                 existingVideo.remove();
+            }
+            const existingOverlay = previewContainer.querySelector('.background-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
             }
             
             // 只在背景启用时应用背景
@@ -1212,27 +1312,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewContainer.style.backgroundSize = 'cover';
                     previewContainer.style.backgroundPosition = 'center';
                     previewContainer.style.backgroundRepeat = 'no-repeat';
-                } else if (currentTask.backgroundType === 'video' && currentTask.backgroundVideo) {
-                    // 应用视频背景
-                    const video = document.createElement('video');
-                    video.className = 'background-video';
-                    video.src = currentTask.backgroundVideo;
-                    video.autoplay = true;
-                    video.muted = true;
-                    video.loop = true;
-                    video.playsInline = true;
-                    video.style.cssText = `
+                    
+                    // 添加蒙版
+                    const overlay = document.createElement('div');
+                    overlay.className = 'background-overlay';
+                    overlay.style.cssText = `
                         position: absolute;
                         top: 0;
                         left: 0;
                         width: 100%;
                         height: 100%;
-                        object-fit: cover;
-                        z-index: -1;
-                        opacity: 0.8;
+                        background-color: rgba(0, 0, 0, ${1 - (currentTask.backgroundImageOpacity || 80) / 100});
+                        z-index: 0;
+                        pointer-events: none;
                     `;
                     previewContainer.style.position = 'relative';
-                    previewContainer.appendChild(video);
+                    previewContainer.appendChild(overlay);
+                    
+                    // 确保文字内容在蒙版之上
+                    const textElements = previewContainer.querySelectorAll('h1, .current-task-indicator, .timer-display, .timer-footer');
+                    textElements.forEach(element => {
+                        element.style.position = 'relative';
+                        element.style.zIndex = '1';
+                    });
                 }
             } else {
                 // 如果背景未启用，使用默认黑色背景
