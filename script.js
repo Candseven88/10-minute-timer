@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const monitorNextBtn = document.getElementById('monitor-next');
     const clearLogBtn = document.getElementById('clear-log');
     
+    // 全屏按钮
+    const fullscreenBtn = document.getElementById('fullscreen');
+    
     // 验证DOM元素是否正确获取
     console.log('DOM元素检查:', {
         daysDigit: daysDigit,
@@ -48,7 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
         secondsDigit: secondsDigit,
         taskIndicator: taskIndicator,
         tasksContainer: tasksContainer,
-        monitorWindow: monitorWindow
+        monitorWindow: monitorWindow,
+        fullscreenBtn: fullscreenBtn
     });
     
     const startButton = document.getElementById('start');
@@ -66,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isRunning = false;
     let savedSettings = null;
     let tasks = []; // 任务数组
+    let isFullscreen = false; // 全屏状态标志
 
     // 日志记录
     let logEntries = [];
@@ -591,6 +596,11 @@ document.addEventListener('DOMContentLoaded', () => {
     monitorWindowBtn.addEventListener('click', showMonitorWindow);
     addTaskBtn.addEventListener('click', addTask);
 
+    // 全屏按钮事件监听
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', toggleFullscreenTimer);
+    }
+
     startButton.addEventListener('click', () => {
         console.log('开始按钮点击，当前状态:', { isRunning, totalSeconds, currentTaskIndex: currentTaskIndex + 1 }); // 调试信息
         startTimer();
@@ -764,6 +774,92 @@ document.addEventListener('DOMContentLoaded', () => {
             togglePreviewBtn.addEventListener('click', togglePreview);
         }
     }
+
+    // 全屏功能
+    function toggleFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+            isFullscreen = false;
+            fullscreenBtn.textContent = '全屏';
+            fullscreenBtn.title = '全屏显示';
+        } else {
+            document.documentElement.requestFullscreen();
+            isFullscreen = true;
+            fullscreenBtn.textContent = '退出全屏';
+            fullscreenBtn.title = '退出全屏';
+        }
+        addLog(`全屏状态已切换为: ${isFullscreen ? '全屏' : '退出全屏'}`, 'info');
+    }
+
+    // 切换倒计时器全屏显示
+    function toggleFullscreenTimer() {
+        const timerContainer = document.querySelector('.timer-container');
+        const appContainer = document.querySelector('.app-container');
+        const timerControls = document.querySelector('.timer-controls');
+        
+        if (!timerContainer) return;
+        
+        if (isFullscreen) {
+            // 退出全屏模式
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+            
+            // 移除全屏样式
+            timerWindow.classList.remove('fullscreen-timer');
+            if (document.querySelector('.fullscreen-exit')) {
+                document.querySelector('.fullscreen-exit').remove();
+            }
+            
+            // 恢复原始状态
+            appContainer.style.display = '';
+            timerWindow.style.display = '';
+            
+            // 显示控制按钮
+            if (timerControls) {
+                timerControls.style.display = '';
+            }
+            
+            fullscreenBtn.textContent = '全屏';
+            fullscreenBtn.title = '全屏显示';
+            isFullscreen = false;
+        } else {
+            // 进入全屏模式
+            timerWindow.classList.add('fullscreen-timer');
+            
+            // 隐藏控制按钮
+            if (timerControls) {
+                timerControls.style.display = 'none';
+            }
+            
+            // 创建退出全屏按钮
+            const exitBtn = document.createElement('button');
+            exitBtn.className = 'fullscreen-exit';
+            exitBtn.innerHTML = '×';
+            exitBtn.title = '退出全屏';
+            exitBtn.addEventListener('click', toggleFullscreenTimer);
+            timerWindow.appendChild(exitBtn);
+            
+            // 请求浏览器全屏
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error('全屏请求被拒绝:', err);
+            });
+            
+            fullscreenBtn.textContent = '退出全屏';
+            fullscreenBtn.title = '退出全屏';
+            isFullscreen = true;
+        }
+        
+        addLog(`倒计时全屏模式: ${isFullscreen ? '开启' : '关闭'}`, 'info');
+    }
+
+    // 监听全屏状态变化
+    document.addEventListener('fullscreenchange', () => {
+        // 如果用户通过浏览器自带功能退出全屏，我们也需要更新UI
+        if (!document.fullscreenElement && isFullscreen) {
+            toggleFullscreenTimer();
+        }
+    });
 
     // Initialize
     loadSettings();
