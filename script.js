@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // 任务指示器
     const taskIndicator = document.getElementById('task-indicator');
     
+    // 倒计时器标题和footer
+    const timerTitle = document.getElementById('timer-title');
+    const timerFooterText = document.getElementById('timer-footer-text');
+    
     // 任务管理元素
     const tasksContainer = document.getElementById('tasks-container');
     const addTaskBtn = document.getElementById('add-task-btn');
@@ -61,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const saveSettingsButton = document.getElementById('save-settings');
     const resetSettingsButton = document.getElementById('reset-settings');
-    const presetButtons = document.querySelectorAll('.preset-btn');
 
     // Timer variables
     let currentTaskIndex = 0; // 当前任务索引
@@ -262,14 +265,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 创建任务HTML
     function createTaskHTML(taskIndex, task = null) {
-        const taskData = task || { days: 0, hours: 0, minutes: 10, seconds: 0 };
+        const taskData = task || { 
+            days: 0, 
+            hours: 0, 
+            minutes: 10, 
+            seconds: 0,
+            title: '倒计时器',
+            taskName: `任务 ${taskIndex + 1}`,
+            footer: '专注工作，高效生活'
+        };
         return `
             <div class="task-section" data-task-index="${taskIndex}">
                 <div class="task-header">
                     <h3>任务 ${taskIndex + 1}</h3>
                     <button class="delete-task-btn" onclick="deleteTask(${taskIndex})" title="删除任务">×</button>
                 </div>
-                <div class="time-settings">
+                
+                <!-- 任务信息设置 - 紧凑布局 -->
+                <div class="task-info-settings">
+                    <div class="setting-group">
+                        <label for="title-input-${taskIndex}">标题</label>
+                        <input type="text" id="title-input-${taskIndex}" value="${taskData.title}" placeholder="倒计时器">
+                    </div>
+                    <div class="setting-group">
+                        <label for="taskname-input-${taskIndex}">任务名称</label>
+                        <input type="text" id="taskname-input-${taskIndex}" value="${taskData.taskName}" placeholder="任务名称">
+                    </div>
+                    <div class="setting-group">
+                        <label for="footer-input-${taskIndex}">底部文字</label>
+                        <input type="text" id="footer-input-${taskIndex}" value="${taskData.footer}" placeholder="底部文字">
+                    </div>
+                </div>
+                
+                <div class="time-settings-row">
                     <div class="setting-group">
                         <label for="days-input-${taskIndex}">天</label>
                         <input type="number" id="days-input-${taskIndex}" min="0" max="365" value="${taskData.days}">
@@ -294,7 +322,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 添加新任务
     function addTask() {
         const taskIndex = tasks.length;
-        const newTask = { days: 0, hours: 0, minutes: 5, seconds: 0 };
+        const newTask = { 
+            days: 0, 
+            hours: 0, 
+            minutes: 5, 
+            seconds: 0,
+            title: '倒计时器',
+            taskName: `任务 ${taskIndex + 1}`,
+            footer: '专注工作，高效生活'
+        };
         tasks.push(newTask);
         
         const taskHTML = createTaskHTML(taskIndex, newTask);
@@ -340,12 +376,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const saved = localStorage.getItem('timerSettings');
         if (saved) {
             savedSettings = JSON.parse(saved);
-            tasks = savedSettings.tasks || [{ days: 0, hours: 0, minutes: 10, seconds: 0 }];
+            tasks = savedSettings.tasks || [{ 
+                days: 0, 
+                hours: 0, 
+                minutes: 10, 
+                seconds: 0,
+                title: '倒计时器',
+                taskName: '任务 1',
+                footer: '专注工作，高效生活'
+            }];
         } else {
             // 默认设置
             tasks = [
-                { days: 0, hours: 0, minutes: 10, seconds: 0 },
-                { days: 0, hours: 0, minutes: 5, seconds: 0 }
+                { 
+                    days: 0, 
+                    hours: 0, 
+                    minutes: 10, 
+                    seconds: 0,
+                    title: '倒计时器',
+                    taskName: '任务 1',
+                    footer: '专注工作，高效生活'
+                },
+                { 
+                    days: 0, 
+                    hours: 0, 
+                    minutes: 5, 
+                    seconds: 0,
+                    title: '倒计时器',
+                    taskName: '任务 2',
+                    footer: '专注工作，高效生活'
+                }
             ];
         }
         renderTasks();
@@ -363,8 +423,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const hours = parseInt(section.querySelector(`#hours-input-${index}`).value) || 0;
             const minutes = parseInt(section.querySelector(`#minutes-input-${index}`).value) || 0;
             const seconds = parseInt(section.querySelector(`#seconds-input-${index}`).value) || 0;
+            const title = section.querySelector(`#title-input-${index}`).value || '倒计时器';
+            const taskName = section.querySelector(`#taskname-input-${index}`).value || `任务 ${index + 1}`;
+            const footer = section.querySelector(`#footer-input-${index}`).value || '专注工作，高效生活';
             
-            newTasks.push({ days, hours, minutes, seconds });
+            newTasks.push({ days, hours, minutes, seconds, title, taskName, footer });
         });
         
         const settings = { tasks: newTasks };
@@ -389,22 +452,44 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply settings to inputs
     function applySettings() {
         if (tasks.length === 0) {
-            tasks = [{ days: 0, hours: 0, minutes: 10, seconds: 0 }];
+            tasks = [{ 
+                days: 0, 
+                hours: 0, 
+                minutes: 10, 
+                seconds: 0,
+                title: '倒计时器',
+                taskName: '任务 1',
+                footer: '专注工作，高效生活'
+            }];
         }
         
-        // 设置当前任务，但不自动开始
-        if (!isRunning) {
-            currentTaskIndex = 0;
-            totalSeconds = tasks[0].days * 24 * 3600 + tasks[0].hours * 3600 + tasks[0].minutes * 60 + tasks[0].seconds;
-            updateDisplay();
-        }
+        currentTaskIndex = 0;
+        totalSeconds = tasks[0].days * 24 * 3600 + tasks[0].hours * 3600 + tasks[0].minutes * 60 + tasks[0].seconds;
+        updateTaskIndicator();
+        updateDisplay();
     }
 
     // Reset settings to default
     function resetToDefault() {
         tasks = [
-            { days: 0, hours: 0, minutes: 10, seconds: 0 },
-            { days: 0, hours: 0, minutes: 5, seconds: 0 }
+            { 
+                days: 0, 
+                hours: 0, 
+                minutes: 10, 
+                seconds: 0,
+                title: '倒计时器',
+                taskName: '任务 1',
+                footer: '专注工作，高效生活'
+            },
+            { 
+                days: 0, 
+                hours: 0, 
+                minutes: 5, 
+                seconds: 0,
+                title: '倒计时器',
+                taskName: '任务 2',
+                footer: '专注工作，高效生活'
+            }
         ];
         
         currentTaskIndex = 0;
@@ -418,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         renderTasks();
         
-        // 重置后不自动开始，需要用户手动点击开始
+        // 重置后不自动开始，需要用户手动点击开始按钮
         alert('已重置为默认设置！点击开始按钮开始执行任务');
     }
 
@@ -513,6 +598,9 @@ document.addEventListener('DOMContentLoaded', () => {
         minutesDigit.textContent = formatTime(minutes);
         secondsDigit.textContent = formatTime(seconds);
         
+        // 更新标题和footer
+        updateTaskInfo();
+        
         // 同步更新监视台信息
         updateMonitorStatus();
         updateMonitorTasksList();
@@ -524,9 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update task indicator
     function updateTaskIndicator() {
-        if (taskIndicator) {
-            taskIndicator.textContent = `当前任务: 任务 ${currentTaskIndex + 1}`;
-        }
+        updateTaskInfo();
         
         // 同步更新监视台信息
         updateMonitorStatus();
@@ -552,6 +638,28 @@ document.addEventListener('DOMContentLoaded', () => {
         
         totalSeconds--;
         updateDisplay();
+    }
+
+    // Update task info (title and footer)
+    function updateTaskInfo() {
+        if (tasks.length > 0 && currentTaskIndex < tasks.length) {
+            const currentTask = tasks[currentTaskIndex];
+            
+            // 更新倒计时器标题
+            if (timerTitle) {
+                timerTitle.textContent = currentTask.title || '倒计时器';
+            }
+            
+            // 更新任务指示器 - 只显示任务名称
+            if (taskIndicator) {
+                taskIndicator.textContent = currentTask.taskName || `任务 ${currentTaskIndex + 1}`;
+            }
+            
+            // 更新footer
+            if (timerFooterText) {
+                timerFooterText.textContent = currentTask.footer || '专注工作，高效生活';
+            }
+        }
     }
 
     // Window switching functions
@@ -625,38 +733,6 @@ document.addEventListener('DOMContentLoaded', () => {
     saveSettingsButton.addEventListener('click', saveSettings);
     resetSettingsButton.addEventListener('click', resetToDefault);
 
-    // Preset button functionality
-    presetButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const days = parseInt(btn.dataset.days) || 0;
-            const hours = parseInt(btn.dataset.hours) || 0;
-            const minutes = parseInt(btn.dataset.minutes) || 0;
-            const seconds = parseInt(btn.dataset.seconds) || 0;
-            
-            console.log('预设按钮点击:', { days, hours, minutes, seconds }); // 调试信息
-            
-            // 为当前选中的任务应用预设
-            if (tasks.length > 0) {
-                const currentTask = tasks[currentTaskIndex];
-                currentTask.days = days;
-                currentTask.hours = hours;
-                currentTask.minutes = minutes;
-                currentTask.seconds = seconds;
-                
-                // 更新显示
-                if (!isRunning) {
-                    totalSeconds = days * 24 * 3600 + hours * 3600 + minutes * 60 + seconds;
-                    updateDisplay();
-                }
-                
-                // 重新渲染任务列表
-                renderTasks();
-                
-                alert('预设时间已应用到当前任务！');
-            }
-        });
-    });
-
     // 预览框功能
     let isPreviewVisible = true;
 
@@ -669,80 +745,55 @@ document.addEventListener('DOMContentLoaded', () => {
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
         
+        // 获取当前任务的信息
+        const currentTask = tasks.length > 0 && currentTaskIndex < tasks.length ? tasks[currentTaskIndex] : null;
+        const title = currentTask ? currentTask.title : '倒计时器';
+        const taskName = currentTask ? currentTask.taskName : `任务 ${currentTaskIndex + 1}`;
+        const footer = currentTask ? currentTask.footer : '专注工作，高效生活';
+        
+        // 生成真正的缩小版镜像，完全复制倒计时页面的HTML结构
         const previewHTML = `
-            <div class="preview-timer-container">
-                <h1>倒计时器</h1>
-                <div class="preview-current-task-indicator">
-                    <span>当前任务: 任务 ${currentTaskIndex + 1}</span>
+            <div class="timer-container preview-mirror">
+                <h1 id="preview-timer-title">${title}</h1>
+                <div class="current-task-indicator">
+                    <span id="preview-task-indicator">${taskName}</span>
                 </div>
-                <div class="preview-timer-display">
-                    <div class="preview-time-row">
-                        <span>${formatTime(days)}</span>
-                        <span class="preview-separator">:</span>
-                        <span>${formatTime(hours)}</span>
-                        <span class="preview-separator">:</span>
-                        <span>${formatTime(minutes)}</span>
-                        <span class="preview-separator">:</span>
-                        <span>${formatTime(seconds)}</span>
+                <div class="timer-display">
+                    <div class="time-unit">
+                        <div class="label">Days</div>
+                        <div class="flip-clock">
+                            <div class="digit">${formatTime(days)}</div>
+                        </div>
                     </div>
-                    <div class="preview-time-labels">
-                        <span class="label">DD</span>
-                        <span class="preview-separator">:</span>
-                        <span class="label">HH</span>
-                        <span class="preview-separator">:</span>
-                        <span class="label">MM</span>
-                        <span class="preview-separator">:</span>
-                        <span class="label">SS</span>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label">Hours</div>
+                        <div class="flip-clock">
+                            <div class="digit">${formatTime(hours)}</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label">Minutes</div>
+                        <div class="flip-clock">
+                            <div class="digit">${formatTime(minutes)}</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label">Seconds</div>
+                        <div class="flip-clock">
+                            <div class="digit">${formatTime(seconds)}</div>
+                        </div>
                     </div>
                 </div>
-                <div class="preview-timer-controls">
-                    <button id="preview-start" ${isRunning ? 'disabled' : ''}>开始</button>
-                    <button id="preview-pause" ${!isRunning ? 'disabled' : ''}>暂停</button>
-                    <button id="preview-reset">重置</button>
+                <div class="timer-footer">
+                    <span id="preview-timer-footer-text">${footer}</span>
                 </div>
             </div>
         `;
         
         previewContent.innerHTML = previewHTML;
-        
-        // 为预览框中的按钮添加事件监听器
-        setupPreviewButtonControls();
-    }
-
-    // 设置预览框控制按钮
-    function setupPreviewButtonControls() {
-        const previewStartBtn = document.getElementById('preview-start');
-        const previewPauseBtn = document.getElementById('preview-pause');
-        const previewResetBtn = document.getElementById('preview-reset');
-        
-        if (previewStartBtn) {
-            previewStartBtn.addEventListener('click', () => {
-                startTimer();
-                addLog('通过预览框启动倒计时', 'success');
-            });
-        }
-        
-        if (previewPauseBtn) {
-            previewPauseBtn.addEventListener('click', () => {
-                clearInterval(timerInterval);
-                isRunning = false;
-                addLog('通过预览框暂停倒计时', 'warning');
-                console.log('倒计时已暂停'); // 调试信息
-            });
-        }
-        
-        if (previewResetBtn) {
-            previewResetBtn.addEventListener('click', () => {
-                clearInterval(timerInterval);
-                isRunning = false;
-                currentTaskIndex = 0;
-                totalSeconds = tasks[0].days * 24 * 3600 + tasks[0].hours * 3600 + tasks[0].minutes * 60 + tasks[0].seconds;
-                console.log('重置倒计时，总秒数:', totalSeconds); // 调试信息
-                updateTaskIndicator();
-                updateDisplay();
-                addLog('通过预览框重置倒计时', 'info');
-            });
-        }
     }
 
     // 刷新预览

@@ -18,7 +18,7 @@
         <!-- 倒计时显示窗口 -->
         <div id="timer-window" class="window active">
             <div class="timer-container">
-                <h1>倒计时器</h1>
+                <h1 id="timer-title">倒计时器</h1>
                 <div class="current-task-indicator">
                     <span id="task-indicator">当前任务: 任务 1</span>
                 </div>
@@ -51,6 +51,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="timer-footer">
+                    <span id="timer-footer-text">专注工作，高效生活</span>
+                </div>
             </div>
             
             <!-- 控制按钮放在倒计时显示框外 -->
@@ -80,17 +83,6 @@
                 <div class="admin-controls">
                     <button id="save-settings">保存设置</button>
                     <button id="reset-settings">重置为默认</button>
-                </div>
-                
-                <div class="preset-buttons">
-                    <h3>快速设置</h3>
-                    <div class="preset-grid">
-                        <button class="preset-btn" data-minutes="5">5分钟</button>
-                        <button class="preset-btn" data-minutes="10">10分钟</button>
-                        <button class="preset-btn" data-minutes="25">25分钟</button>
-                        <button class="preset-btn" data-hours="1">1小时</button>
-                        <button class="preset-btn" data-days="1">1天</button>
-                    </div>
                 </div>
             </div>
         </div>
