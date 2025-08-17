@@ -1,0 +1,14 @@
+name = "10-minute-timer"
+type = "webpack"
+account_id = "" # Add your Cloudflare account ID here
+workers_dev = true
+route = ""
+zone_id = "" # Add your Cloudflare zone ID here if you're using a custom domain
+
+[site]
+bucket = "./" # Directory with static assets
+entry-point = "workers-site" # Directory with Workers script
+
+[env.production]
+# Production-specific settings
+workers_dev = false # Disable workers.dev subdomain in production 

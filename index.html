@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义倒计时器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 窗口切换按钮 -->
+        <div class="window-switcher">
+            <button id="timer-window-btn" class="window-btn active">倒计时</button>
+            <button id="admin-window-btn" class="window-btn">设置</button>
+            <button id="monitor-window-btn" class="window-btn">监视台</button>
+        </div>
+
+        <!-- 倒计时显示窗口 -->
+        <div id="timer-window" class="window active">
+            <div class="timer-container">
+                <h1>倒计时器</h1>
+                <div class="current-task-indicator">
+                    <span id="task-indicator">当前任务: 任务 1</span>
+                </div>
+                <div class="timer-display">
+                    <div class="time-unit">
+                        <div class="label">Days</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label">Hours</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label">Minutes</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label">Seconds</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 控制按钮放在倒计时显示框外 -->
+            <div class="timer-controls">
+                <button id="start">开始</button>
+                <button id="pause">暂停</button>
+                <button id="reset">重置</button>
+            </div>
+        </div>
+
+        <!-- 管理员设置窗口 -->
+        <div id="admin-window" class="window">
+            <div class="container">
+                <h1>时间设置</h1>
+                
+                <!-- 任务列表容器 -->
+                <div id="tasks-container">
+                    <!-- 任务会动态添加到这里 -->
+                </div>
+                
+                <!-- 添加任务按钮 -->
+                <div class="add-task-section">
+                    <button id="add-task-btn" class="add-task-btn">+ 添加新任务</button>
+                </div>
+
+                <div class="admin-controls">
+                    <button id="save-settings">保存设置</button>
+                    <button id="reset-settings">重置为默认</button>
+                </div>
+                
+                <div class="preset-buttons">
+                    <h3>快速设置</h3>
+                    <div class="preset-grid">
+                        <button class="preset-btn" data-minutes="5">5分钟</button>
+                        <button class="preset-btn" data-minutes="10">10分钟</button>
+                        <button class="preset-btn" data-minutes="25">25分钟</button>
+                        <button class="preset-btn" data-hours="1">1小时</button>
+                        <button class="preset-btn" data-days="1">1天</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 监视台窗口 -->
+        <div id="monitor-window" class="window">
+            <div class="container">
+                <h1>监视台</h1>
+                
+                <!-- 前端预览框 -->
+                <div class="preview-section">
+                    <h2>前端预览</h2>
+                    <div class="preview-container">
+                        <div class="preview-header">
+                            <span class="preview-title">倒计时页面实时预览</span>
+                            <div class="preview-controls">
+                                <button id="refresh-preview" class="preview-btn" title="刷新预览">🔄</button>
+                                <button id="toggle-preview" class="preview-btn" title="显示/隐藏预览">👁️</button>
+                            </div>
+                        </div>
+                        <div id="preview-content" class="preview-content">
+                            <!-- 预览内容会动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="monitor-controls">
+                    <h2>远程控制</h2>
+                    <div class="control-buttons">
+                        <button id="monitor-start" class="control-btn start">开始</button>
+                        <button id="monitor-pause" class="control-btn pause">暂停</button>
+                        <button id="monitor-reset" class="control-btn reset">重置</button>
+                        <button id="monitor-next" class="control-btn next">下一任务</button>
+                    </div>
+                </div>
+                
+                <!-- 任务列表概览 -->
+                <div class="tasks-overview">
+                    <h2>任务概览</h2>
+                    <div id="monitor-tasks-list" class="tasks-list">
+                        <!-- 任务列表会动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 实时状态显示 -->
+                <div class="status-section">
+                    <h2>实时状态</h2>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <label>运行状态:</label>
+                            <span id="monitor-status" class="status-value">未开始</span>
+                        </div>
+                        <div class="status-item">
+                            <label>当前任务:</label>
+                            <span id="monitor-current-task" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <label>剩余时间:</label>
+                            <span id="monitor-remaining-time" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <label>总进度:</label>
+                            <span id="monitor-progress" class="status-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日志记录 -->
+                <div class="log-section">
+                    <h2>执行日志</h2>
+                    <div id="monitor-log" class="log-container">
+                        <!-- 日志内容会动态生成 -->
+                    </div>
+                    <button id="clear-log" class="clear-log-btn">清空日志</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 

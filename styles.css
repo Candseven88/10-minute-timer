@@ -1,0 +1,860 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.window-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 0.5rem;
+}
+
+.window-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    background-color: white;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.window-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.window-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.window {
+    display: none;
+}
+
+.window.active {
+    display: block;
+}
+
+/* 倒计时显示容器 */
+.timer-container {
+    text-align: center;
+    background-color: #000;
+    padding: 3rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 700px;
+    margin: 0 auto 2rem auto;
+}
+
+.timer-container h1 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 2rem;
+}
+
+.current-task-indicator {
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.current-task-indicator span {
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* 倒计时显示样式 - 翻页时钟风格 */
+.timer-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.time-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.label {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.flip-clock {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+    border-radius: 8px;
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.digit {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+}
+
+/* 分隔符样式 */
+.separator {
+    color: #666;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0 0.5rem;
+    align-self: flex-end;
+    margin-bottom: 1.5rem;
+}
+
+/* 控制按钮样式 */
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.timer-controls button {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+#start {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#pause {
+    background-color: #FFC107;
+    color: #333;
+}
+
+#reset {
+    background-color: #F44336;
+    color: white;
+}
+
+.timer-controls button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 设置窗口样式 */
+.container {
+    text-align: center;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+h3 {
+    color: #555;
+    margin: 1rem 0 0.8rem 0;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.3rem;
+    display: inline-block;
+}
+
+/* 任务列表容器 */
+#tasks-container {
+    margin-bottom: 1.5rem;
+}
+
+.task-section {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.task-section:last-child {
+    margin-bottom: 0;
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.task-header h3 {
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+.delete-task-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.delete-task-btn:hover {
+    background-color: #c82333;
+    transform: scale(1.1);
+}
+
+.add-task-section {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.add-task-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-task-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.time-settings {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+    margin: 0.8rem 0;
+}
+
+.setting-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.setting-group label {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.setting-group input {
+    width: 80px;
+    padding: 0.4rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.setting-group input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.admin-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+#save-settings {
+    background-color: #2196F3;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#reset-settings {
+    background-color: #9C27B0;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.admin-controls button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.preset-buttons {
+    margin-top: 1.5rem;
+}
+
+.preset-buttons h3 {
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.preset-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.preset-btn {
+    background-color: #6c757d;
+    color: white;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.preset-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+}
+
+/* 监视台样式 */
+.preview-section, .status-section, .tasks-overview, .monitor-controls, .log-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.preview-section h2, .status-section h2, .tasks-overview h2, .monitor-controls h2, .log-section h2 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* 前端预览框样式 */
+.preview-container {
+    background-color: white;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.preview-title {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.preview-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.preview-btn {
+    background: none;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background-color: white;
+}
+
+.preview-btn:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.preview-content {
+    padding: 1rem;
+    min-height: 200px;
+    background-color: #f0f2f5;
+    position: relative;
+}
+
+/* 预览内容中的倒计时样式 */
+.preview-timer-container {
+    background-color: #000;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.preview-timer-container h1 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.preview-current-task-indicator {
+    margin-bottom: 1rem;
+    padding: 0.4rem 0.8rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.preview-current-task-indicator span {
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.preview-timer-display {
+    margin: 1rem 0;
+}
+
+.preview-time-row {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
+.preview-time-row span {
+    display: inline-block;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.preview-separator {
+    color: #666;
+    margin: 0;
+}
+
+.preview-time-labels {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #666;
+    line-height: 1;
+}
+
+.preview-time-labels .label {
+    display: inline-block;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.preview-timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.preview-timer-controls button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.preview-timer-controls #preview-start {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.preview-timer-controls #preview-pause {
+    background-color: #FFC107;
+    color: #333;
+}
+
+.preview-timer-controls #preview-reset {
+    background-color: #F44336;
+    color: white;
+}
+
+.preview-timer-controls button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* 预览隐藏状态 */
+.preview-content.hidden {
+    display: none;
+}
+
+.preview-content.hidden::after {
+    content: "预览已隐藏";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #6c757d;
+    font-style: italic;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.status-item label {
+    font-weight: bold;
+    color: #555;
+}
+
+.status-value {
+    font-weight: bold;
+    color: #007bff;
+    padding: 0.3rem 0.8rem;
+    background-color: #e3f2fd;
+    border-radius: 15px;
+    font-size: 0.9rem;
+}
+
+/* 任务列表样式 */
+.tasks-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem;
+    margin-bottom: 0.5rem;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s;
+}
+
+.task-item.current {
+    border-color: #28a745;
+    background-color: #d4edda;
+}
+
+.task-item.completed {
+    border-color: #6c757d;
+    background-color: #f8f9fa;
+    opacity: 0.7;
+}
+
+.task-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.task-number {
+    font-weight: bold;
+    color: #007bff;
+    min-width: 40px;
+}
+
+.task-time {
+    font-family: 'Courier New', monospace;
+    color: #333;
+}
+
+.task-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.task-status.current {
+    background-color: #28a745;
+    color: white;
+}
+
+.task-status.completed {
+    background-color: #6c757d;
+    color: white;
+}
+
+.task-status.pending {
+    background-color: #ffc107;
+    color: #333;
+}
+
+/* 控制按钮样式 */
+.control-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.control-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    min-width: 100px;
+}
+
+.control-btn.start {
+    background-color: #28a745;
+    color: white;
+}
+
+.control-btn.pause {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.control-btn.reset {
+    background-color: #dc3545;
+    color: white;
+}
+
+.control-btn.next {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.control-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 日志样式 */
+.log-container {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.log-entry {
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-time {
+    color: #6c757d;
+    margin-right: 0.5rem;
+}
+
+.log-message {
+    color: #333;
+}
+
+.log-message.info {
+    color: #007bff;
+}
+
+.log-message.success {
+    color: #28a745;
+}
+
+.log-message.warning {
+    color: #ffc107;
+}
+
+.log-message.error {
+    color: #dc3545;
+}
+
+.clear-log-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: all 0.3s;
+}
+
+.clear-log-btn:hover {
+    background-color: #5a6268;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+    .time-row {
+        font-size: 2.5rem;
+    }
+    
+    .time-labels {
+        font-size: 1rem;
+    }
+    
+    .timer-controls, .admin-controls {
+        flex-direction: column;
+    }
+    
+    .timer-controls button, .admin-controls button {
+        width: 100%;
+    }
+    
+    .tasks-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .time-settings {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .preset-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .window-switcher {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .timer-container {
+        padding: 2rem 1rem;
+    }
+    
+    .container {
+        padding: 1.5rem;
+    }
+
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .control-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .control-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .task-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+} 
