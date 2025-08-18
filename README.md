@@ -75,6 +75,12 @@
    npm run deploy
    ```
 
+5. 访问应用:
+   - Workers 子域名: `https://10-minute-timer.<your-subdomain>.workers.dev`
+   - 自定义域名: `https://10-minute-timer.website`
+
+> **注意**: 详细的部署指南请查看 [DEPLOYMENT.md](DEPLOYMENT.md) 文件。
+
 ## 技术特性
 
 - **纯前端实现**：无需后端服务器

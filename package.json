@@ -1,19 +1,20 @@
 {
   "name": "10-minute-timer",
   "version": "1.0.0",
-  "description": "A simple 10-minute countdown timer",
+  "description": "A customizable countdown timer with multiple tasks and cloud sync",
   "main": "index.html",
   "scripts": {
     "dev": "serve .",
     "start": "serve .",
-    "deploy": "wrangler publish"
+    "deploy": "npx wrangler deploy",
+    "wrangler": "npx wrangler"
   },
   "dependencies": {
     "@cloudflare/kv-asset-handler": "^0.3.0",
     "serve": "^14.0.0"
   },
   "devDependencies": {
-    "wrangler": "^3.0.0"
+    "wrangler": "^4.30.0"
   },
   "author": "",
   "license": "MIT"

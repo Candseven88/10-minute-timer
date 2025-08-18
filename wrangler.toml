@@ -1,14 +1,24 @@
 name = "10-minute-timer"
-type = "webpack"
-account_id = "" # Add your Cloudflare account ID here
 workers_dev = true
-route = ""
-zone_id = "" # Add your Cloudflare zone ID here if you're using a custom domain
+main = "workers-site/index.js"
+compatibility_date = "2025-08-18"
+account_id = "5c22bca118f3aff455dce4c65d36e343"
 
 [site]
-bucket = "./" # Directory with static assets
-entry-point = "workers-site" # Directory with Workers script
+bucket = "./"
 
-[env.production]
-# Production-specific settings
-workers_dev = false # Disable workers.dev subdomain in production 
+# 自定义域名配置
+# 如果您的域名已添加到Cloudflare，取消注释下面的配置
+routes = [
+  { pattern = "10-minute-timer.website/*", zone_name = "10-minute-timer.website" },
+  { pattern = "www.10-minute-timer.website/*", zone_name = "10-minute-timer.website" }
+]
+
+[[kv_namespaces]]
+binding = "STATE_KV"
+# KV命名空间ID已更新
+id = "7506bd4db8f64e4a9f9e98918cf570c1"
+
+# 环境变量配置
+[vars]
+ADMIN_TOKEN = "Cjh110110" 

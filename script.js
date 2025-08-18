@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ==== i18n start ====
     const i18n = {
-        current: 'zh',
+        current: 'en',
         dict: {
             zh: {
                 window_timer: '倒计时',
@@ -103,6 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 log_all_done: '所有任务执行完成',
                 log_fullscreen_on: '倒计时全屏模式: 开启',
                 log_fullscreen_off: '倒计时全屏模式: 关闭',
+                // cloud sync labels
+                sync_channel_label: '频道ID (channel)',
+                sync_token_label: '管理员密钥 (仅管理员输入)',
+                save_sync_btn: '保存同步设置',
+                generate_link_btn: '一键生成观众链接',
+                share_link_hint: '观众链接:',
+                share_link_empty: '设置频道ID以生成分享链接',
             },
             en: {
                 window_timer: 'Timer',
@@ -153,6 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 log_all_done: 'All tasks finished',
                 log_fullscreen_on: 'Fullscreen: ON',
                 log_fullscreen_off: 'Fullscreen: OFF',
+                // cloud sync labels
+                sync_channel_label: 'Channel ID',
+                sync_token_label: 'Admin Token (admin only)',
+                save_sync_btn: 'Save Sync Settings',
+                generate_link_btn: 'Generate Viewer Link',
+                share_link_hint: 'Viewer Link:',
+                share_link_empty: 'Set a channel ID to generate a share link',
             }
         }
     };
@@ -236,6 +250,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTaskIndicator();
         // 状态值（运行/停止）
         updateMonitorStatus();
+        // cloud sync labels/buttons
+        if (syncChannelLabel) syncChannelLabel.textContent = getT('sync_channel_label');
+        if (syncTokenLabel) syncTokenLabel.textContent = getT('sync_token_label');
+        if (saveSyncBtn) saveSyncBtn.textContent = getT('save_sync_btn');
+        if (genLinkBtn) genLinkBtn.textContent = getT('generate_link_btn');
+        if (monitorShareBtn) monitorShareBtn.title = i18n.current==='zh' ? '生成并复制观众链接' : 'Generate & Copy Viewer Link';
+        updateShareLink();
+        updateMonitorShareLink();
     }
 
     function setLanguage(lang) {
@@ -246,11 +268,12 @@ document.addEventListener('DOMContentLoaded', () => {
         generatePreviewContent();
         // 同步到展示端
         bcPost({ type: 'LANG', lang });
+        pushStateToCloud({});
     }
 
     // 初始化语言
     (function initLanguage() {
-        const savedLang = localStorage.getItem('timerLang') || 'zh';
+        const savedLang = localStorage.getItem('timerLang') || 'en';
         i18n.current = savedLang;
         if (languageSelect) languageSelect.value = savedLang;
     })();
@@ -259,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         languageSelect.addEventListener('change', (e) => setLanguage(e.target.value));
     }
     // ==== i18n end ====
-
+    
     // 验证DOM元素是否正确获取
     console.log('DOM元素检查:', {
         daysDigit: daysDigit,
@@ -278,6 +301,352 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const saveSettingsButton = document.getElementById('save-settings');
     const resetSettingsButton = document.getElementById('reset-settings');
+
+    // 云同步配置元素
+    const channelInput = document.getElementById('channel-id-input');
+    const adminTokenInput = document.getElementById('admin-token-input');
+    const saveSyncBtn = document.getElementById('save-sync-btn');
+    const shareLinkEl = document.getElementById('share-link');
+    const genLinkBtn = document.getElementById('generate-link-btn');
+    const syncChannelLabel = document.getElementById('sync-channel-label');
+    const syncTokenLabel = document.getElementById('sync-token-label');
+
+    // Monitor share link elements
+    const monitorShareBtn = document.getElementById('monitor-share-btn');
+
+    // Default admin token (per request)
+    const DEFAULT_ADMIN_TOKEN = 'Cjh110110';
+
+    // Worker API base
+    const API_BASE = location.origin;
+
+    function loadSyncConfig() {
+        const cfg = JSON.parse(localStorage.getItem('cloudSync') || '{}');
+        if (!cfg.token) cfg.token = DEFAULT_ADMIN_TOKEN; // auto-fill token
+        localStorage.setItem('cloudSync', JSON.stringify(cfg));
+        if (channelInput) channelInput.value = cfg.channel || '';
+        if (adminTokenInput) {
+            adminTokenInput.value = cfg.token;
+            // 简化：隐藏 token 输入（仍保留 DOM 以兼容旧逻辑）
+            adminTokenInput.parentElement.style.display = 'none';
+        }
+        updateShareLink();
+        updateMonitorShareLink();
+    }
+
+    function saveSyncConfig() {
+        const cfg = JSON.parse(localStorage.getItem('cloudSync') || '{}');
+        cfg.channel = channelInput?.value?.trim() || cfg.channel || '';
+        cfg.token = adminTokenInput?.value?.trim() || DEFAULT_ADMIN_TOKEN;
+        localStorage.setItem('cloudSync', JSON.stringify(cfg));
+        updateShareLink();
+        updateMonitorShareLink();
+        alert('同步设置已保存');
+    }
+
+    function generateChannel() {
+        const rand = Math.random().toString(36).slice(2, 7);
+        const ymd = new Date().toISOString().slice(0,10).replace(/-/g,'');
+        return `ev${ymd}-${rand}`;
+    }
+
+    function handleGenerateLink() {
+        if (!channelInput) return;
+        if (!channelInput.value.trim()) {
+            channelInput.value = generateChannel();
+        }
+        saveSyncConfig();
+    }
+
+    function currentShareUrl() {
+        const cfg = JSON.parse(localStorage.getItem('cloudSync') || '{}');
+        const ch = cfg.channel || '';
+        if (!ch) return '';
+        return `${location.origin}/display.html?channel=${encodeURIComponent(ch)}`;
+    }
+
+    function updateShareLink() {
+        const url = currentShareUrl();
+        if (shareLinkEl) {
+            if (url) {
+                shareLinkEl.innerHTML = `
+                    <div class="share-link-container">
+                        <span class="share-link-label">${getT('share_link_hint')}</span>
+                        <div class="share-link-content">
+                            <a href="${url}" target="_blank" class="share-link-url">${url}</a>
+                            <button class="copy-link-btn" onclick="copyShareLink()" title="${i18n.current==='zh' ? '复制链接' : 'Copy link'}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="share-link-qr" id="share-link-qr"></div>
+                    </div>
+                `;
+                // 生成二维码
+                generateQRCode(url, 'share-link-qr');
+            } else {
+                shareLinkEl.innerHTML = `<div class="empty-share-link">${getT('share_link_empty')}</div>`;
+            }
+        }
+    }
+
+    function updateMonitorShareLink() {
+        const url = currentShareUrl();
+        // 在监视台页面添加分享链接显示
+        const monitorShareContainer = document.getElementById('monitor-share-container');
+        if (monitorShareContainer) {
+            if (url) {
+                monitorShareContainer.innerHTML = `
+                    <div class="share-link-container">
+                        <span class="share-link-label">${getT('share_link_hint')}</span>
+                        <div class="share-link-content">
+                            <a href="${url}" target="_blank" class="share-link-url">${url}</a>
+                            <button class="copy-link-btn" onclick="copyShareLink()" title="${i18n.current==='zh' ? '复制链接' : 'Copy link'}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="share-link-qr" id="monitor-share-qr"></div>
+                    </div>
+                `;
+                // 生成二维码
+                generateQRCode(url, 'monitor-share-qr');
+            } else {
+                monitorShareContainer.innerHTML = `<div class="empty-share-link">${getT('share_link_empty')}</div>`;
+            }
+        }
+    }
+
+    // 复制分享链接到剪贴板
+    window.copyShareLink = async function() {
+        const url = currentShareUrl();
+        if (!url) return;
+        
+        try {
+            await navigator.clipboard.writeText(url);
+            showNotification(i18n.current === 'zh' ? '链接已复制到剪贴板' : 'Link copied to clipboard', 'success');
+        } catch (err) {
+            // 回退方法
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showNotification(i18n.current === 'zh' ? '链接已复制到剪贴板' : 'Link copied to clipboard', 'success');
+        }
+    };
+
+    // 生成二维码
+    function generateQRCode(text, elementId) {
+        if (!text || !elementId) return;
+        
+        // 简单的二维码生成方法，使用外部API
+        const element = document.getElementById(elementId);
+        if (element) {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(text)}`;
+            element.innerHTML = `<img src="${qrUrl}" alt="QR Code" class="qr-code-img">`;
+        }
+    }
+
+    // 显示通知
+    function showNotification(message, type = 'info') {
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        // 样式
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            z-index: 10000;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        `;
+        
+        if (type === 'success') {
+            notification.style.background = 'rgba(40, 167, 69, 0.9)';
+        } else if (type === 'error') {
+            notification.style.background = 'rgba(220, 53, 69, 0.9)';
+        }
+        
+        document.body.appendChild(notification);
+        
+        // 显示通知
+        setTimeout(() => {
+            notification.style.transform = 'translateY(0)';
+            notification.style.opacity = '1';
+        }, 10);
+        
+        // 自动隐藏
+        setTimeout(() => {
+            notification.style.transform = 'translateY(20px)';
+            notification.style.opacity = '0';
+            
+            // 移除元素
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    // 改进分享链接生成按钮处理
+    function handleGenerateLink() {
+        if (!channelInput) return;
+        
+        // 如果没有频道ID，生成一个新的
+        if (!channelInput.value.trim()) {
+            channelInput.value = generateChannel();
+        }
+        
+        // 保存配置
+        saveSyncConfig();
+        
+        // 显示成功通知
+        showNotification(
+            i18n.current === 'zh' ? '观众链接已生成' : 'Viewer link generated', 
+            'success'
+        );
+        
+        // 尝试复制链接到剪贴板
+        copyShareLink();
+    }
+
+    // 改进监视台分享按钮
+    monitorShareBtn?.addEventListener('click', async () => {
+        // 生成唯一频道并保存
+        const cfg = JSON.parse(localStorage.getItem('cloudSync') || '{}');
+        if (!cfg.channel) {
+            const ch = generateChannel();
+            if (channelInput) channelInput.value = ch;
+            saveSyncConfig();
+        }
+        
+        // 更新链接并复制
+        copyShareLink();
+        
+        // 立即把当前状态写入云端，观众打开就有最新状态
+        pushStateToCloud({ startedAt: isRunning ? Date.now() : null });
+    });
+
+    // 添加CSS样式
+    function addShareLinkStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .share-link-container {
+                margin-top: 15px;
+                padding: 15px;
+                background: rgba(0, 0, 0, 0.05);
+                border-radius: 8px;
+                border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            
+            .share-link-label {
+                display: block;
+                margin-bottom: 10px;
+                font-weight: bold;
+                color: #555;
+            }
+            
+            .share-link-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .share-link-url {
+                flex: 1;
+                padding: 8px 12px;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                color: #007bff;
+                text-decoration: none;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-family: monospace;
+                font-size: 14px;
+            }
+            
+            .copy-link-btn {
+                background: #007bff;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            
+            .copy-link-btn:hover {
+                background: #0069d9;
+            }
+            
+            .share-link-qr {
+                display: flex;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            
+            .qr-code-img {
+                max-width: 150px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+            
+            .empty-share-link {
+                padding: 10px;
+                color: #6c757d;
+                font-style: italic;
+                text-align: center;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 初始化时添加样式
+    document.addEventListener('DOMContentLoaded', () => {
+        addShareLinkStyles();
+    });
+
+    async function pushStateToCloud(partial) {
+        const cfg = JSON.parse(localStorage.getItem('cloudSync') || '{}');
+        if (!cfg.channel || !cfg.token) return; // 未配置则跳过
+        const payload = {
+            tasks,
+            currentTaskIndex,
+            isRunning,
+            startedAt: partial?.startedAt ?? null,
+            remainingSeconds: partial?.remainingSeconds ?? totalSeconds,
+            lang: i18n.current
+        };
+        try {
+            await fetch(`${API_BASE}/api/state?channel=${encodeURIComponent(cfg.channel)}`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                    'authorization': `Bearer ${cfg.token}`
+                },
+                body: JSON.stringify(payload)
+            });
+        } catch (e) {
+            console.warn('push state failed', e);
+        }
+    }
 
     // Timer variables
     let currentTaskIndex = 0; // 当前任务索引
@@ -443,6 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addLog(`${i18n.current === 'zh' ? '通过监视台暂停倒计时' : 'Paused from monitor'}`, 'warning');
                 console.log('倒计时已暂停'); // 调试信息
                 bcPost({ type: 'PAUSE', remainingSeconds: totalSeconds });
+                pushStateToCloud({});
             });
         }
         
@@ -457,6 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateDisplay();
                 addLog(`${i18n.current === 'zh' ? '通过监视台重置倒计时' : 'Reset from monitor'}`, 'info');
                 bcPost({ type: 'RESET', tasks, currentTaskIndex, remainingSeconds: totalSeconds, lang: i18n.current });
+                pushStateToCloud({});
             });
         }
         
@@ -747,7 +1118,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            newTasks.push({ days, hours, minutes, seconds, title, taskName, footer, backgroundType, backgroundColor, backgroundImage, backgroundEnabled, backgroundImageOpacity });
+            newTasks.push({ 
+                days, 
+                hours, 
+                minutes, 
+                seconds, 
+                title, 
+                taskName, 
+                footer, 
+                backgroundType, 
+                backgroundColor, 
+                backgroundImage, 
+                backgroundEnabled, 
+                backgroundImageOpacity 
+            });
         });
         
         const settings = { tasks: newTasks };
@@ -763,10 +1147,13 @@ document.addEventListener('DOMContentLoaded', () => {
             currentTaskIndex = 0;
             totalSeconds = tasks[0].days * 24 * 3600 + tasks[0].hours * 3600 + tasks[0].minutes * 60 + tasks[0].seconds;
             updateDisplay();
+            // 立即应用背景设置
+            applyBackgroundToTimer();
         }
         
         // 通知展示端设置变更
         bcPost({ type: 'SETTINGS', tasks });
+        pushStateToCloud({});
         
         // Show success message (localized)
         const savedTasksCount = newTasks.length;
@@ -780,7 +1167,11 @@ document.addEventListener('DOMContentLoaded', () => {
             taskDetails += `• ${i18n.current === 'zh' ? '任务' : 'Task'} ${index + 1}: "${task.title}" (${task.taskName}) - ${backgroundInfo}\n`;
         });
         
-        alert(message + `${i18n.current === 'zh' ? '已配置' : 'Configured'} ${savedTasksCount} ${i18n.current === 'zh' ? '个任务' : 'tasks'}：\n` + taskDetails + `\n${getT('alert_settings_saved_hint')}`);
+        // 使用通知而不是alert
+        showNotification(`${getT('alert_settings_saved_title')}`, 'success');
+        
+        // 显示设置详情
+        console.log(message + `${i18n.current === 'zh' ? '已配置' : 'Configured'} ${savedTasksCount} ${i18n.current === 'zh' ? '个任务' : 'tasks'}：\n` + taskDetails + `\n${getT('alert_settings_saved_hint')}`);
     }
 
     // Apply settings to inputs
@@ -854,6 +1245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 通知展示端
         bcPost({ type: 'RESET', tasks, currentTaskIndex, remainingSeconds: totalSeconds, lang: i18n.current });
+        pushStateToCloud({});
         
         // 重置后不自动开始，需要用户手动点击开始按钮
         alert(getT('alert_reset_done'));
@@ -864,37 +1256,33 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTaskIndex++;
         
         if (currentTaskIndex < tasks.length) {
-            // 切换到下一个任务
             const nextTask = tasks[currentTaskIndex];
             totalSeconds = nextTask.days * 24 * 3600 + nextTask.hours * 3600 + nextTask.minutes * 60 + nextTask.seconds;
             console.log('切换到任务', currentTaskIndex + 1, '，总秒数:', totalSeconds);
             
             addLog(`${getT('log_switch_auto')} ${currentTaskIndex + 1}`, 'info');
             
-            // 静默切换，不显示弹框
+            // 更新本地UI
             updateTaskIndicator();
             updateDisplay();
             
-            // 通知展示端切换
-            bcPost({ type: 'NEXT', currentTaskIndex, remainingSeconds: totalSeconds, startedAt: Date.now() });
-            
-            // 自动开始下一个任务（因为用户已经开始了第一个任务）
+            // 先启动（使 isRunning=true），再广播/上云，避免观众端收到 isRunning=false 的中间态
             startTimer();
+            
+            // 本地多页签即时同步
+            bcPost({ type: 'NEXT', currentTaskIndex, remainingSeconds: totalSeconds, startedAt: Date.now() });
+            // 云上同步（startTimer 内已 push，一次即可）
         } else {
-            // 所有任务完成
             currentTaskIndex = 0;
             totalSeconds = tasks[0].days * 24 * 3600 + tasks[0].hours * 3600 + tasks[0].minutes * 60 + tasks[0].seconds;
             console.log('所有任务完成，重置为任务1，总秒数:', totalSeconds);
             
             addLog(getT('log_all_done'), 'success');
             
-            // 静默完成，不显示弹框
             isRunning = false;
             clearInterval(timerInterval);
             updateTaskIndicator();
             updateDisplay();
-            
-            // 可选循环执行略
         }
     }
 
@@ -905,8 +1293,10 @@ document.addEventListener('DOMContentLoaded', () => {
             timerInterval = setInterval(countdown, 1000);
             console.log('倒计时已启动，任务:', currentTaskIndex + 1);
             addLog(`${getT('log_started')} ${currentTaskIndex + 1}`, 'success');
-            // 通知展示端开始
-            bcPost({ type: 'START', tasks, currentTaskIndex, remainingSeconds: totalSeconds, startedAt: Date.now(), lang: i18n.current });
+            // 同步到展示端开始
+            const startedAt = Date.now();
+            bcPost({ type: 'START', tasks, currentTaskIndex, remainingSeconds: totalSeconds, startedAt, lang: i18n.current });
+            pushStateToCloud({ startedAt });
         }
     }
 
@@ -1064,7 +1454,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     startButton.addEventListener('click', () => {
-        console.log('开始按钮点击，当前状态:', { isRunning, totalSeconds, currentTaskIndex: currentTaskIndex + 1 }); // 调试信息
+        console.log('开始按钮点击，当前状态:', { isRunning, totalSeconds, currentTaskIndex: currentTaskIndex + 1 });
+        // 若未配置频道ID，自动生成一个，降低操作复杂度
+        try {
+            const cfg = JSON.parse(localStorage.getItem('cloudSync') || '{}');
+            if (channelInput && (!cfg.channel || !cfg.channel.trim())) {
+                channelInput.value = (function(){ const r=Math.random().toString(36).slice(2,7); const d=new Date().toISOString().slice(0,10).replace(/-/g,''); return `ev${d}-${r}`; })();
+                saveSyncConfig();
+            }
+        } catch (e) {}
         startTimer();
     });
 
@@ -1073,6 +1471,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isRunning = false;
         console.log('倒计时已暂停'); // 调试信息
         bcPost({ type: 'PAUSE', remainingSeconds: totalSeconds });
+        pushStateToCloud({});
     });
 
     resetButton.addEventListener('click', () => {
@@ -1084,6 +1483,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTaskIndicator();
         updateDisplay();
         bcPost({ type: 'RESET', tasks, currentTaskIndex, remainingSeconds: totalSeconds, lang: i18n.current });
+        pushStateToCloud({});
     });
 
     saveSettingsButton.addEventListener('click', saveSettings);
@@ -1275,6 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     updateDisplay();
     console.log('初始化完成，总秒数:', totalSeconds); // 调试信息
+    loadSyncConfig();
 
     // 更新背景设置显示
     window.updateBackgroundSettings = function(taskIndex) {
@@ -1293,6 +1694,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 更新预览
         updateTaskPreview(taskIndex);
+        
+        // 如果是当前任务，立即应用更改
+        if (taskIndex === currentTaskIndex) {
+            // 更新当前任务的背景类型
+            tasks[taskIndex].backgroundType = backgroundType;
+            
+            // 应用背景设置
+            applyBackgroundToTimer();
+            
+            // 显示通知
+            showNotification(
+                i18n.current === 'zh' ? '背景类型已更改' : 'Background type changed',
+                'info'
+            );
+        }
     };
 
     // 切换背景设置启用/禁用
@@ -1302,9 +1718,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (backgroundEnabledCheckbox && backgroundOptions) {
             // 根据勾选框的当前状态显示或隐藏背景选项
-            backgroundOptions.style.display = backgroundEnabledCheckbox.checked ? 'block' : 'none';
+            const isEnabled = backgroundEnabledCheckbox.checked;
+            backgroundOptions.style.display = isEnabled ? 'block' : 'none';
+            
             // 更新预览
             updateTaskPreview(taskIndex);
+            
+            // 如果是当前任务，立即应用更改
+            if (taskIndex === currentTaskIndex) {
+                // 更新当前任务的背景启用状态
+                tasks[taskIndex].backgroundEnabled = isEnabled;
+                
+                // 应用背景设置
+                applyBackgroundToTimer();
+                
+                // 显示通知
+                showNotification(
+                    isEnabled ? 
+                        (i18n.current === 'zh' ? '背景设置已启用' : 'Background settings enabled') : 
+                        (i18n.current === 'zh' ? '背景设置已禁用' : 'Background settings disabled'),
+                    'info'
+                );
+            }
         }
     };
 
@@ -1412,12 +1847,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 imageUrlInput.value = e.target.result;
                 imageFileStatus.textContent = `${i18n.current === 'zh' ? '已上传' : 'Uploaded'}: ${file.name}`;
                 imageFileStatus.style.color = '#28a745';
+                
+                // 更新预览
                 updateImageOpacityPreview(taskIndex);
                 updateTaskPreview(taskIndex);
+                
+                // 立即更新当前任务的背景图片设置
+                if (taskIndex === currentTaskIndex) {
+                    // 更新当前任务的图片URL
+                    tasks[taskIndex].backgroundImage = e.target.result;
+                    
+                    // 确保背景类型设置为image
+                    tasks[taskIndex].backgroundType = 'image';
+                    
+                    // 确保背景启用
+                    tasks[taskIndex].backgroundEnabled = true;
+                    
+                    // 应用背景设置
+                    applyBackgroundToTimer();
+                    
+                    // 显示成功通知
+                    showNotification(
+                        i18n.current === 'zh' ? '背景图片已更新' : 'Background image updated',
+                        'success'
+                    );
+                }
             };
             reader.onerror = function() {
                 imageFileStatus.textContent = i18n.current === 'zh' ? '图片处理失败' : 'Image processing failed';
                 imageFileStatus.style.color = '#dc3545';
+                
+                // 显示错误通知
+                showNotification(
+                    i18n.current === 'zh' ? '图片处理失败' : 'Image processing failed',
+                    'error'
+                );
             };
             reader.readAsDataURL(file);
         }
@@ -1427,10 +1891,41 @@ document.addEventListener('DOMContentLoaded', () => {
     window.clearImageFile = function(taskIndex) {
         const imageUrlInput = document.getElementById(`background-image-${taskIndex}`);
         const imageFileStatus = document.getElementById(`image-file-status-${taskIndex}`);
-        imageUrlInput.value = '';
-        imageFileStatus.textContent = i18n.current === 'zh' ? '已清除' : 'Cleared';
-        imageFileStatus.style.color = 'red';
+        const fileInput = document.getElementById(`background-image-file-${taskIndex}`);
+        
+        // 清除文件输入
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        // 清除URL输入
+        if (imageUrlInput) {
+            imageUrlInput.value = '';
+        }
+        
+        // 更新状态
+        if (imageFileStatus) {
+            imageFileStatus.textContent = i18n.current === 'zh' ? '已清除' : 'Cleared';
+            imageFileStatus.style.color = '#dc3545';
+        }
+        
+        // 更新预览
         updateTaskPreview(taskIndex);
+        
+        // 如果是当前任务，立即应用更改
+        if (taskIndex === currentTaskIndex) {
+            // 更新当前任务的图片URL
+            tasks[taskIndex].backgroundImage = '';
+            
+            // 应用背景设置
+            applyBackgroundToTimer();
+            
+            // 显示通知
+            showNotification(
+                i18n.current === 'zh' ? '背景图片已清除' : 'Background image cleared',
+                'info'
+            );
+        }
     };
 
     // 应用背景到倒计时容器

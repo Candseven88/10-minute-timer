@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Countdown Display</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
         .viewer-header {
@@ -22,8 +25,54 @@
             border-radius: 6px;
             cursor: pointer;
             backdrop-filter: blur(6px);
+            transition: all 0.3s ease;
         }
-        .viewer-btn:hover { opacity: 0.9; }
+        .viewer-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        
+        /* 连接状态指示器 */
+        .connection-status {
+            position: fixed;
+            bottom: 12px;
+            left: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            z-index: 1000;
+        }
+        
+        .connection-status:hover {
+            opacity: 1;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+        
+        .status-indicator.offline {
+            background: #dc3545;
+        }
+        
+        .status-indicator.connecting {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
@@ -69,6 +118,12 @@
                 <div class="timer-footer">
                     <span id="viewer-footer">专注工作，高效生活</span>
                 </div>
+            </div>
+            
+            <!-- 连接状态指示器 -->
+            <div id="connection-status" class="connection-status">
+                <div id="status-indicator" class="status-indicator connecting"></div>
+                <span id="status-text">连接中...</span>
             </div>
         </div>
     </div>

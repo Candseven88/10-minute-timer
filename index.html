@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>自定义倒计时器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -75,6 +78,23 @@
             <div class="container">
                 <h1 id="admin-title">时间设置</h1>
                 
+                <!-- 云同步设置（隐藏简化） -->
+                <div class="background-settings" id="cloud-sync-block" style="margin-bottom: 1rem; display:none;">
+                    <div class="setting-group">
+                        <label id="sync-channel-label" for="channel-id-input">频道ID (channel)</label>
+                        <input type="text" id="channel-id-input" placeholder="如: event001">
+                    </div>
+                    <div class="setting-group">
+                        <label id="sync-token-label" for="admin-token-input">管理员密钥 (仅管理员输入)</label>
+                        <input type="password" id="admin-token-input" placeholder="用于写入云端">
+                    </div>
+                    <div class="setting-group">
+                        <button id="save-sync-btn">保存同步设置</button>
+                        <button id="generate-link-btn" style="margin-top:0.4rem;">一键生成观众链接</button>
+                        <div id="share-link" style="margin-top:0.4rem; font-size:0.85rem; color:#555;"></div>
+                    </div>
+                </div>
+                
                 <!-- 任务列表容器 -->
                 <div id="tasks-container">
                     <!-- 任务会动态添加到这里 -->
@@ -104,12 +124,17 @@
                         <div class="preview-header">
                             <span class="preview-title" id="preview-title-text">倒计时页面实时预览</span>
                             <div class="preview-controls">
+                                <button id="monitor-share-btn" class="preview-btn" title="生成并复制观众链接">🔗</button>
                                 <button id="refresh-preview" class="preview-btn" title="刷新预览">🔄</button>
                                 <button id="toggle-preview" class="preview-btn" title="显示/隐藏预览">👁️</button>
                             </div>
                         </div>
                         <div id="preview-content" class="preview-content">
                             <!-- 预览内容会动态生成 -->
+                        </div>
+                        <!-- 分享链接容器 -->
+                        <div id="monitor-share-container" class="monitor-share-container">
+                            <!-- 分享链接会动态生成 -->
                         </div>
                     </div>
                 </div>
