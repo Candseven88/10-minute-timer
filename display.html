@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Display</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .viewer-header {
+            position: fixed;
+            top: 12px;
+            right: 16px;
+            z-index: 10000;
+            display: flex;
+            gap: 8px;
+        }
+        .viewer-btn {
+            padding: 0.4rem 0.8rem;
+            border: 1px solid rgba(255,255,255,0.5);
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+        }
+        .viewer-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div id="timer-window" class="window active">
+            <div class="viewer-header">
+                <button id="viewer-fullscreen" class="viewer-btn" title="全屏/Fullscreen">⛶</button>
+            </div>
+            <div class="timer-container">
+                <h1 id="viewer-title">倒计时器</h1>
+                <div class="current-task-indicator">
+                    <span id="viewer-task-indicator">当前任务: 任务 1</span>
+                </div>
+                <div class="timer-display">
+                    <div class="time-unit">
+                        <div class="label" id="viewer-label-days">Days</div>
+                        <div class="flip-clock">
+                            <div class="digit" id="viewer-days">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label" id="viewer-label-hours">Hours</div>
+                        <div class="flip-clock">
+                            <div class="digit" id="viewer-hours">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label" id="viewer-label-minutes">Minutes</div>
+                        <div class="flip-clock">
+                            <div class="digit" id="viewer-minutes">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label" id="viewer-label-seconds">Seconds</div>
+                        <div class="flip-clock">
+                            <div class="digit" id="viewer-seconds">00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timer-footer">
+                    <span id="viewer-footer">专注工作，高效生活</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="display.js"></script>
+</body>
+</html> 
