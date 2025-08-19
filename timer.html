@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义倒计时器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 窗口切换按钮 -->
+        <div class="window-switcher">
+            <!-- 返回首页按钮 -->
+            <a href="index.html" class="home-btn" title="返回首页">🏠</a>
+            <button id="timer-window-btn" class="window-btn active">倒计时</button>
+            <button id="admin-window-btn" class="window-btn">设置</button>
+            <button id="monitor-window-btn" class="window-btn">监视台</button>
+            <!-- 语言选择器（不改变布局，仅附加一个选择器） -->
+            <select id="language-select" class="language-select" aria-label="Language">
+                <option value="zh">中文</option>
+                <option value="en" selected>English</option>
+            </select>
+        </div>
+
+        <!-- 倒计时显示窗口 -->
+        <div id="timer-window" class="window active">
+            <div class="timer-container">
+                <h1 id="timer-title">倒计时器</h1>
+                <div class="current-task-indicator">
+                    <span id="task-indicator">当前任务: 任务 1</span>
+                </div>
+                <div class="timer-display">
+                    <div class="time-unit">
+                        <div class="label" id="label-days">Days</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label" id="label-hours">Hours</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label" id="label-minutes">Minutes</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                    <div class="separator">:</div>
+                    <div class="time-unit">
+                        <div class="label" id="label-seconds">Seconds</div>
+                        <div class="flip-clock">
+                            <div class="digit">00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="timer-footer">
+                    <span id="timer-footer-text">专注工作，高效生活</span>
+                </div>
+            </div>
+            
+            <!-- 控制按钮放在倒计时显示框外 -->
+            <div class="timer-controls">
+                <button id="start">开始</button>
+                <button id="pause">暂停</button>
+                <button id="reset">重置</button>
+                <button id="fullscreen" title="全屏显示">全屏</button>
+            </div>
+        </div>
+
+        <!-- 管理员设置窗口 -->
+        <div id="admin-window" class="window">
+            <div class="container">
+                <h1 id="admin-title">时间设置</h1>
+                
+                <!-- 云同步设置（隐藏简化） -->
+                <div class="background-settings" id="cloud-sync-block" style="margin-bottom: 1rem; display:none;">
+                    <div class="setting-group">
+                        <label id="sync-channel-label" for="channel-id-input">频道ID (channel)</label>
+                        <input type="text" id="channel-id-input" placeholder="如: event001">
+                    </div>
+                    <div class="setting-group">
+                        <label id="sync-token-label" for="admin-token-input">管理员密钥 (仅管理员输入)</label>
+                        <input type="password" id="admin-token-input" placeholder="用于写入云端">
+                    </div>
+                    <div class="setting-group">
+                        <button id="save-sync-btn">保存同步设置</button>
+                        <button id="generate-link-btn" style="margin-top:0.4rem;">一键生成观众链接</button>
+                        <div id="share-link" style="margin-top:0.4rem; font-size:0.85rem; color:#555;"></div>
+                    </div>
+                </div>
+                
+                <!-- 任务列表容器 -->
+                <div id="tasks-container">
+                    <!-- 任务会动态添加到这里 -->
+                </div>
+                
+                <!-- 添加任务按钮 -->
+                <div class="add-task-section">
+                    <button id="add-task-btn" class="add-task-btn">+ 添加新任务</button>
+                </div>
+
+                <div class="admin-controls">
+                    <button id="save-settings">保存设置</button>
+                    <button id="reset-settings">重置为默认</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 监视台窗口 -->
+        <div id="monitor-window" class="window">
+            <div class="container">
+                <h1 id="monitor-title">监视台</h1>
+                
+                <!-- 前端预览框 -->
+                <div class="preview-section">
+                    <h2 id="preview-section-title">前端预览</h2>
+                    <div class="preview-container">
+                        <div class="preview-header">
+                            <span class="preview-title" id="preview-title-text">倒计时页面实时预览</span>
+                            <div class="preview-controls">
+                                <button id="monitor-share-btn" class="preview-btn" title="生成并复制观众链接">🔗</button>
+                                <button id="refresh-preview" class="preview-btn" title="刷新预览">🔄</button>
+                                <button id="toggle-preview" class="preview-btn" title="显示/隐藏预览">👁️</button>
+                            </div>
+                        </div>
+                        <div id="preview-content" class="preview-content">
+                            <!-- 预览内容会动态生成 -->
+                        </div>
+                        <!-- 分享链接容器 -->
+                        <div id="monitor-share-container" class="monitor-share-container">
+                            <!-- 分享链接会动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="monitor-controls">
+                    <h2 id="monitor-controls-title">远程控制</h2>
+                    <div class="control-buttons">
+                        <button id="monitor-start" class="control-btn start">开始</button>
+                        <button id="monitor-pause" class="control-btn pause">暂停</button>
+                        <button id="monitor-reset" class="control-btn reset">重置</button>
+                        <button id="monitor-next" class="control-btn next">下一任务</button>
+                    </div>
+                </div>
+                
+                <!-- 任务列表概览 -->
+                <div class="tasks-overview">
+                    <h2 id="tasks-overview-title">任务概览</h2>
+                    <div id="monitor-tasks-list" class="tasks-list">
+                        <!-- 任务列表会动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 实时状态显示 -->
+                <div class="status-section">
+                    <h2 id="status-section-title">实时状态</h2>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <label id="status-label-running">运行状态:</label>
+                            <span id="monitor-status" class="status-value">未开始</span>
+                        </div>
+                        <div class="status-item">
+                            <label id="status-label-current-task">当前任务:</label>
+                            <span id="monitor-current-task" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <label id="status-label-remaining">剩余时间:</label>
+                            <span id="monitor-remaining-time" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <label id="status-label-progress">总进度:</label>
+                            <span id="monitor-progress" class="status-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日志记录 -->
+                <div class="log-section">
+                    <h2 id="log-section-title">执行日志</h2>
+                    <div id="monitor-log" class="log-container">
+                        <!-- 日志内容会动态生成 -->
+                    </div>
+                    <button id="clear-log" class="clear-log-btn">清空日志</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 

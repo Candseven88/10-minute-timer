@@ -334,7 +334,7 @@
 	window.addEventListener('storage', (e)=>{
 		if(e.key === 'timerSettings') loadSettings();
 		if(e.key === 'timerLang'){
-			i18n.current = localStorage.getItem('timerLang') || 'zh';
+			i18n.current = localStorage.getItem('timerLang') || 'en';
 			applyTaskInfo();
 		}
 	});
