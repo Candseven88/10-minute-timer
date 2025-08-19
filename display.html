@@ -26,8 +26,26 @@
             cursor: pointer;
             backdrop-filter: blur(6px);
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
         }
-        .viewer-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .viewer-btn:hover { 
+            opacity: 0.9; 
+            transform: translateY(-2px); 
+            background: rgba(0,0,0,0.6);
+        }
+        
+        .home-btn {
+            background: rgba(102, 126, 234, 0.8) !important;
+            border-color: rgba(102, 126, 234, 0.9) !important;
+        }
+        
+        .home-btn:hover {
+            background: rgba(102, 126, 234, 1) !important;
+        }
         
         /* 连接状态指示器 */
         .connection-status {
@@ -79,6 +97,7 @@
     <div class="app-container">
         <div id="timer-window" class="window active">
             <div class="viewer-header">
+                <a href="index.html" class="viewer-btn home-btn" title="返回主页/Return Home">🏠</a>
                 <button id="viewer-fullscreen" class="viewer-btn" title="全屏/Fullscreen">⛶</button>
             </div>
             <div class="timer-container">

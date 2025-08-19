@@ -3,40 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer - Homepage</title>
+    <meta name="description" content="Free online timer with multiple duration options including 10 minute timer, 15 minute timer, 5 minute timer, and more. Perfect for work, exercise, cooking, and classroom use.">
+    <meta name="keywords" content="10 minute timer, 15 minute timer, 5 minute timer, 20 minute timer, 30 minute timer, online timer, countdown timer, free timer">
+    <meta name="author" content="Timer App">
+    <meta name="robots" content="index, follow">
+    <title>Free Online Timer - 10 Minute Timer, 15 Minute Timer & More | Countdown Timer App</title>
+    <link rel="canonical" href="https://yourdomain.com/">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Free Online Timer - Multiple Duration Options">
+    <meta property="og:description" content="Use our free online timer with preset options for 5, 10, 15, 20, 30 minutes and custom durations. Perfect for work, exercise, and daily tasks.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:image" content="https://yourdomain.com/images/timer-preview.jpg">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free Online Timer - Multiple Duration Options">
+    <meta name="twitter:description" content="Use our free online timer with preset options for 5, 10, 15, 20, 30 minutes and custom durations.">
+    
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
         }
         
         .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 3rem;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         
-        h1 {
-            font-size: 2.5rem;
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
             margin-bottom: 1rem;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         
-        p {
-            font-size: 1.2rem;
+        .hero p {
+            font-size: 1.3rem;
             margin-bottom: 2rem;
             opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
         }
         
         .btn {
@@ -49,7 +118,6 @@
             font-weight: 600;
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            margin: 0.5rem;
         }
         
         .btn:hover {
@@ -63,86 +131,298 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
         
-        .features {
-            margin-top: 2rem;
+        .features-section {
+            padding: 4rem 0;
+            background: white;
+        }
+        
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+        
+        .quick-timers {
+            padding: 4rem 0;
+            background: #f8f9fa;
+        }
+        
+        .quick-timers h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #495057;
+        }
+        
+        .timer-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
-            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
-        .feature {
-            background: rgba(255, 255, 255, 0.1);
+        .timer-btn {
             padding: 1rem;
+            background: white;
+            border: 2px solid #667eea;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #667eea;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        .feature h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 1.1rem;
+        .timer-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
         }
         
-        .feature p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
+        .use-cases {
+            padding: 4rem 0;
+            background: white;
         }
         
-        @media (max-width: 600px) {
-            .container {
-                padding: 2rem 1rem;
-                margin: 1rem;
+        .use-cases h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #495057;
+        }
+        
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .use-case {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .use-case h3 {
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+        
+        footer {
+            background: #343a40;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
             }
             
-            h1 {
-                font-size: 2rem;
+            .nav-links {
+                display: none;
             }
             
-            .features {
-                grid-template-columns: 1fr;
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .timer-buttons {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>⏰ Timer</h1>
-        <p>A powerful countdown application with multi-task management and real-time monitoring</p>
-        
-        <div>
-            <a href="timer.html" class="btn primary">🚀 Get Started</a>
-            <a href="display.html" class="btn">📺 Display Mode</a>
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">⏰ Timer App</a>
+            <div class="nav-links">
+                <a href="timer.html">Timer</a>
+                <a href="display.html">Display</a>
+                <a href="about.html">About</a>
+                <a href="blog.html">Blog</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Free Online Timer & Countdown App</h1>
+                <p>Set a 10 minute timer, 15 minute timer, or any custom duration you need. Perfect for work, exercise, cooking, and classroom activities. Our free online timer helps you stay focused and productive.</p>
+                <div class="cta-buttons">
+                    <a href="timer.html" class="btn primary">🚀 Start Timer Now</a>
+                    <a href="display.html" class="btn">📺 Display Mode</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <h2>Why Choose Our Timer App?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Quick Preset Timers</h3>
+                        <p>Instantly start with popular durations like 5 minute timer, 10 minute timer, 15 minute timer, 20 minute timer, and 30 minute timer. No setup required.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Custom Duration</h3>
+                        <p>Set any time from 1 minute timer to 1 hour timer or more. Perfect for specific tasks that need precise timing.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Responsive Design</h3>
+                        <p>Works perfectly on desktop, tablet, and mobile devices. Use our timer on any device, anywhere.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔔</div>
+                        <h3>Audio Alerts</h3>
+                        <p>Get notified when your timer completes with clear audio alerts. Never miss a timer again.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💾</div>
+                        <h3>Local Storage</h3>
+                        <p>Your timer settings are automatically saved locally. Pick up right where you left off.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌐</div>
+                        <h3>No Registration</h3>
+                        <p>Start using our free online timer immediately. No downloads, no sign-ups, just pure functionality.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-timers">
+            <div class="container">
+                <h2>Quick Start Timers</h2>
+                <div class="timer-buttons">
+                    <a href="timer.html?duration=1" class="timer-btn">1 Minute Timer</a>
+                    <a href="timer.html?duration=2" class="timer-btn">2 Minute Timer</a>
+                    <a href="timer.html?duration=3" class="timer-btn">3 Minute Timer</a>
+                    <a href="timer.html?duration=5" class="timer-btn">5 Minute Timer</a>
+                    <a href="timer.html?duration=10" class="timer-btn">10 Minute Timer</a>
+                    <a href="timer.html?duration=15" class="timer-btn">15 Minute Timer</a>
+                    <a href="timer.html?duration=20" class="timer-btn">20 Minute Timer</a>
+                    <a href="timer.html?duration=25" class="timer-btn">25 Minute Timer</a>
+                    <a href="timer.html?duration=30" class="timer-btn">30 Minute Timer</a>
+                    <a href="timer.html?duration=60" class="timer-btn">1 Hour Timer</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="use-cases">
+            <div class="container">
+                <h2>Perfect For Every Situation</h2>
+                <div class="use-cases-grid">
+                    <div class="use-case">
+                        <h3>⏰ Work & Productivity</h3>
+                        <p>Use our 25 minute timer for Pomodoro technique, or set a 10 minute timer for quick breaks.</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>🏃‍♂️ Exercise & Fitness</h3>
+                        <p>Perfect for workout intervals, rest periods, and circuit training with our interval timer.</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>👨‍🍳 Cooking & Kitchen</h3>
+                        <p>Set a 10 minute timer for boiling eggs, or use our kitchen timer for precise cooking.</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>📚 Study & Learning</h3>
+                        <p>Stay focused with study sessions using our countdown timer. Perfect for students and professionals.</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>🏫 Classroom & Education</h3>
+                        <p>Teachers love our classroom timer for activities, tests, and group work sessions.</p>
+                    </div>
+                    <div class="use-case">
+                        <h3>🎯 Presentations & Meetings</h3>
+                        <p>Keep meetings on track with our professional timer. Display mode perfect for large audiences.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="about.html">About Us</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
+                <a href="blog.html">Blog</a>
+            </div>
+            <p>&copy; 2024 Timer App. All rights reserved. Free online timer for everyone.</p>
         </div>
-        
-        <div class="features">
-            <div class="feature">
-                <h3>🎯 Multi-Task Management</h3>
-                <p>Support creating and managing multiple countdown tasks</p>
-            </div>
-            <div class="feature">
-                <h3>📱 Responsive Design</h3>
-                <p>Perfectly adapts to various device sizes</p>
-            </div>
-            <div class="feature">
-                <h3>🔧 Flexible Configuration</h3>
-                <p>Customizable time settings and task parameters</p>
-            </div>
-            <div class="feature">
-                <h3>📊 Real-time Monitoring</h3>
-                <p>Monitor console for remote countdown control</p>
-            </div>
-        </div>
-    </div>
-    
+    </footer>
+
     <script>
-        // Auto-redirect feature (optional)
-        // If user doesn't click within 5 seconds, automatically redirect to main page
-        setTimeout(() => {
-            if (!document.querySelector('.btn:hover')) {
-                window.location.href = 'timer.html';
-            }
-        }, 5000);
+        // Add smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Auto-redirect feature for quick timer buttons
+        document.querySelectorAll('.timer-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.includes('?duration=')) {
+                    e.preventDefault();
+                    const duration = href.split('=')[1];
+                    localStorage.setItem('quickTimerDuration', duration);
+                    window.location.href = 'timer.html';
+                }
+            });
+        });
     </script>
 </body>
 </html> 

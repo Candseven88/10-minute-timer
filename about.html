@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn about Timer App - the team behind the free online timer that helps millions stay productive. Discover our mission to make time management simple and effective for everyone.">
+    <meta name="keywords" content="about timer app, timer app team, free online timer, time management app, productivity timer, countdown timer app">
+    <meta name="author" content="Timer App">
+    <meta name="robots" content="index, follow">
+    <title>About Timer App - Our Mission to Simplify Time Management | Free Online Timer</title>
+    <link rel="canonical" href="https://yourdomain.com/about.html">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="About Timer App - Our Mission to Simplify Time Management">
+    <meta property="og:description" content="Learn about Timer App - the team behind the free online timer that helps millions stay productive with simple, effective time management tools.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/about.html">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            background: white;
+            text-align: center;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #495057;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            color: #6c757d;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .mission-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .mission-section h2 {
+            color: #495057;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .mission-section p {
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        .story-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .story-section h2 {
+            color: #495057;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .story-section h3 {
+            color: #495057;
+            margin: 2rem 0 1rem 0;
+            font-size: 1.5rem;
+        }
+        
+        .story-section p {
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .values-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .values-section h2 {
+            color: #495057;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .value-card {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .value-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .value-card h3 {
+            color: #495057;
+            margin-bottom: 1rem;
+        }
+        
+        .value-card p {
+            color: #6c757d;
+        }
+        
+        .team-section {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .team-section h2 {
+            color: #495057;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .team-member {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .team-member h3 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .team-role {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .team-member p {
+            color: #6c757d;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+        
+        .cta-section h2 {
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .cta-section p {
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        footer {
+            background: #343a40;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .mission-section, .story-section, .values-section, .team-section {
+                padding: 2rem 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">⏰ Timer App</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="timer.html">Timer</a>
+                <a href="display.html">Display</a>
+                <a href="about.html">About</a>
+                <a href="blog.html">Blog</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>About Timer App</h1>
+                <p>We're on a mission to make time management simple, effective, and accessible to everyone. Our free online timer helps millions of people stay productive and focused every day.</p>
+            </div>
+        </section>
+
+        <div class="container">
+            <section class="mission-section">
+                <h2>Our Mission</h2>
+                <p>At Timer App, we believe that effective time management shouldn't be complicated or expensive. Our mission is to provide simple, reliable, and free tools that help people make the most of their time, whether they're working, studying, exercising, or cooking.</p>
+                
+                <p>We understand that in today's fast-paced world, people need quick access to reliable timing tools. That's why we've created a comprehensive suite of timer solutions that work seamlessly across all devices and platforms. From setting a <strong>10 minute timer</strong> for quick work sessions to using our <strong>countdown timer</strong> for important deadlines, we're here to support your productivity journey.</p>
+                
+                <p>Our commitment to simplicity means that anyone can start using our <strong>free online timer</strong> immediately, without downloads, registrations, or complex setups. We believe that the best productivity tools are the ones you can start using right away.</p>
+            </section>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">10M+</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </section>
+
+            <section class="story-section">
+                <h2>Our Story</h2>
+                
+                <p>Timer App was born from a simple observation: while there were many complex productivity tools available, there was a lack of simple, reliable timing solutions that people could use immediately without any barriers.</p>
+                
+                <h3>The Beginning</h3>
+                <p>Our journey started in 2020 when our founder, a productivity consultant, noticed that clients were struggling with basic time management. They needed simple tools to help them stay focused during work sessions, but existing solutions were either too complex or required significant setup time.</p>
+                
+                <p>We began with a basic <strong>10 minute timer</strong> concept, designed to help people implement the Pomodoro Technique without the complexity of traditional apps. The response was overwhelming - people loved the simplicity and effectiveness of our approach.</p>
+                
+                <h3>Growth and Evolution</h3>
+                <p>As our user base grew, so did our understanding of what people really needed. We expanded beyond simple timers to include features like <strong>countdown timer</strong> displays, interval timers for exercise, and specialized timers for cooking and classroom use.</p>
+                
+                <p>Today, Timer App serves millions of users worldwide, from students using our <strong>classroom timer</strong> features to professionals implementing productivity techniques with our <strong>work timer</strong> solutions.</p>
+                
+                <h3>Looking Forward</h3>
+                <p>Our commitment to simplicity and accessibility remains at the core of everything we do. We continue to innovate and improve our <strong>free online timer</strong> platform while maintaining the ease of use that our users love.</p>
+                
+                <p>We're excited about the future of time management and look forward to helping even more people achieve their productivity goals with simple, effective tools.</p>
+            </section>
+
+            <section class="values-section">
+                <h2>Our Core Values</h2>
+                <div class="values-grid">
+                    <div class="value-card">
+                        <div class="value-icon">🎯</div>
+                        <h3>Simplicity</h3>
+                        <p>We believe that the best tools are the ones you can use immediately without learning curves or complex setups.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🔓</div>
+                        <h3>Accessibility</h3>
+                        <p>Our <strong>free online timer</strong> is available to everyone, regardless of their technical expertise or financial situation.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">⚡</div>
+                        <h3>Reliability</h3>
+                        <p>We maintain 99.9% uptime to ensure that our users can always access their timers when they need them most.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🤝</div>
+                        <h3>Community</h3>
+                        <p>We actively listen to our users and continuously improve our tools based on their feedback and needs.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">🌱</div>
+                        <h3>Innovation</h3>
+                        <p>We constantly explore new ways to make time management more effective and enjoyable for our users.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="value-icon">💚</div>
+                        <h3>Sustainability</h3>
+                        <p>We're committed to building a sustainable business that serves our users' needs for years to come.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="team-section">
+                <h2>Meet Our Team</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="team-avatar">👨‍💼</div>
+                        <h3>Alex Chen</h3>
+                        <div class="team-role">Founder & CEO</div>
+                        <p>Productivity expert with 15+ years of experience helping individuals and organizations optimize their time management strategies.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="team-avatar">👩‍💻</div>
+                        <h3>Sarah Johnson</h3>
+                        <div class="team-role">Lead Developer</div>
+                        <p>Full-stack developer passionate about creating intuitive user experiences and reliable technical solutions.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="team-avatar">👨‍🎨</div>
+                        <h3>Mike Rodriguez</h3>
+                        <div class="team-role">UX Designer</div>
+                        <p>User experience specialist focused on making complex productivity tools simple and enjoyable to use.</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="team-avatar">👩‍🏫</div>
+                        <h3>Dr. Emily Watson</h3>
+                        <div class="team-role">Productivity Research</div>
+                        <p>Behavioral psychologist specializing in time management research and productivity optimization techniques.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cta-section">
+                <h2>Join Millions of Productive Users</h2>
+                <p>Experience the power of simple, effective time management with our free online timer. Start your productivity journey today!</p>
+                <a href="timer.html" class="btn">🚀 Start Using Timer App Now</a>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="timer.html">Timer</a>
+                <a href="display.html">Display</a>
+                <a href="about.html">About</a>
+                <a href="blog.html">Blog</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+            </div>
+            <p>&copy; 2024 Timer App. All rights reserved. Making time management simple and effective for everyone.</p>
+        </div>
+    </footer>
+</body>
+</html> 
