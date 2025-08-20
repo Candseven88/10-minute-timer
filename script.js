@@ -48,7 +48,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearLogBtn = document.getElementById('clear-log');
     
     // 全屏按钮
-    const fullscreenBtn = document.getElementById('fullscreen');
+    
+    // 声音提醒元素
+    const soundReminder = document.getElementById('sound-reminder');
+    const timerContainer = document.querySelector('.timer-container');
+    
+    // 音频元素
+    let warningAudio = null;
+    let isWarningActive = false;
 
     // ==== i18n start ====
     const i18n = {
@@ -68,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn_start: '开始',
                 btn_pause: '暂停',
                 btn_reset: '重置',
-                btn_fullscreen: '全屏',
+        
                 admin_title: '时间设置',
                 add_task: '+ 添加新任务',
                 save_settings: '保存设置',
@@ -101,8 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 log_task_finished: '任务 完成',
                 log_switch_auto: '自动切换到任务',
                 log_all_done: '所有任务执行完成',
-                log_fullscreen_on: '倒计时全屏模式: 开启',
-                log_fullscreen_off: '倒计时全屏模式: 关闭',
+                
                 // cloud sync labels
                 sync_channel_label: '频道ID (channel)',
                 sync_token_label: '管理员密钥 (仅管理员输入)',
@@ -125,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn_start: 'Start',
                 btn_pause: 'Pause',
                 btn_reset: 'Reset',
-                btn_fullscreen: 'Fullscreen',
+        
                 admin_title: 'Time Settings',
                 add_task: '+ Add Task',
                 save_settings: 'Save',
@@ -158,8 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 log_task_finished: 'Task finished',
                 log_switch_auto: 'Auto switched to task',
                 log_all_done: 'All tasks finished',
-                log_fullscreen_on: 'Fullscreen: ON',
-                log_fullscreen_off: 'Fullscreen: OFF',
+                
                 // cloud sync labels
                 sync_channel_label: 'Channel ID',
                 sync_token_label: 'Admin Token (admin only)',
@@ -205,10 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (startBtn) startBtn.textContent = getT('btn_start');
         if (pauseBtn) pauseBtn.textContent = getT('btn_pause');
         if (resetBtn) resetBtn.textContent = getT('btn_reset');
-        if (fullscreenBtn) {
-            fullscreenBtn.textContent = i18n.current === 'zh' ? '全屏' : getT('btn_fullscreen');
-            fullscreenBtn.title = i18n.current === 'zh' ? '全屏显示' : getT('btn_fullscreen');
-        }
+        
         // 管理窗口
         const adminTitle = document.getElementById('admin-title');
         const addTaskTextBtn = document.getElementById('add-task-btn');
@@ -292,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         taskIndicator: taskIndicator,
         tasksContainer: tasksContainer,
         monitorWindow: monitorWindow,
-        fullscreenBtn: fullscreenBtn
+
     });
     
     const startButton = document.getElementById('start');
@@ -655,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isRunning = false;
     let savedSettings = null;
     let tasks = []; // 任务数组
-    let isFullscreen = false; // 全屏状态标志
+
 
     // 日志记录
     let logEntries = [];
@@ -809,6 +811,10 @@ document.addEventListener('DOMContentLoaded', () => {
             monitorPauseBtn.addEventListener('click', () => {
                 clearInterval(timerInterval);
                 isRunning = false;
+                
+                // 停止警告提醒
+                stopWarning();
+                
                 addLog(`${i18n.current === 'zh' ? '通过监视台暂停倒计时' : 'Paused from monitor'}`, 'warning');
                 console.log('倒计时已暂停'); // 调试信息
                 bcPost({ type: 'PAUSE', remainingSeconds: totalSeconds });
@@ -820,6 +826,10 @@ document.addEventListener('DOMContentLoaded', () => {
             monitorResetBtn.addEventListener('click', () => {
                 clearInterval(timerInterval);
                 isRunning = false;
+                
+                // 停止警告提醒
+                stopWarning();
+                
                 currentTaskIndex = 0;
                 totalSeconds = tasks[0].days * 24 * 3600 + tasks[0].hours * 3600 + tasks[0].minutes * 60 + tasks[0].seconds;
                 console.log('重置倒计时，总秒数:', totalSeconds); // 调试信息
@@ -863,7 +873,10 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundColor: '#000000', // 背景颜色
             backgroundImage: '', // 背景图片URL
             backgroundEnabled: true, // 背景是否启用
-            backgroundImageOpacity: 80 // 图片背景透明度
+            backgroundImageOpacity: 80, // 图片背景透明度
+            warningEnabled: true, // 是否启用提醒
+            warningSeconds: 60, // 提前多少秒开始提醒
+            soundEnabled: true // 是否启用声音提醒
         };
         return `
             <div class="task-section" data-task-index="${taskIndex}">
@@ -947,6 +960,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- 提醒设置 -->
+                        <div class="warning-settings">
+                            <h4>${i18n.current === 'zh' ? '提醒设置' : 'Warning Settings'}</h4>
+                            <div class="setting-group">
+                                <label>
+                                    <input type="checkbox" id="warning-enabled-${taskIndex}" ${taskData.warningEnabled ? 'checked' : ''} onchange="toggleWarningSettings(${taskIndex})">
+                                    ${i18n.current === 'zh' ? '启用倒计时提醒' : 'Enable countdown warning'}
+                                </label>
+                            </div>
+                            
+                            <div class="warning-options" id="warning-options-${taskIndex}" style="display: ${taskData.warningEnabled ? 'block' : 'none'}">
+                                <div class="setting-group">
+                                    <label for="warning-seconds-${taskIndex}">${i18n.current === 'zh' ? '提前提醒时间' : 'Warning time (seconds)'}</label>
+                                    <input type="number" id="warning-seconds-${taskIndex}" min="10" max="300" value="${taskData.warningSeconds || 60}" placeholder="60">
+                                    <span class="unit-label">${i18n.current === 'zh' ? '秒' : 'seconds'}</span>
+                                </div>
+                                
+                                <div class="setting-group">
+                                    <label>
+                                        <input type="checkbox" id="sound-enabled-${taskIndex}" ${taskData.soundEnabled ? 'checked' : ''}>
+                                        ${i18n.current === 'zh' ? '启用声音提醒' : 'Enable sound warning'}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -987,7 +1026,10 @@ document.addEventListener('DOMContentLoaded', () => {
             backgroundColor: '#000000', // 默认背景颜色
             backgroundImage: '', // 默认背景图片
             backgroundEnabled: true, // 默认启用背景
-            backgroundImageOpacity: 80 // 默认图片背景透明度
+            backgroundImageOpacity: 80, // 默认图片背景透明度
+            warningEnabled: true, // 默认启用提醒
+            warningSeconds: 60, // 默认提前60秒提醒
+            soundEnabled: true // 默认启用声音提醒
         };
         tasks.push(newTask);
         
@@ -1046,7 +1088,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
                 backgroundEnabled: true, // 默认启用背景
-                backgroundImageOpacity: 80 // 默认图片背景透明度
+                backgroundImageOpacity: 80, // 默认图片背景透明度
+                warningEnabled: true, // 默认启用提醒
+                warningSeconds: 60, // 默认提前60秒提醒
+                soundEnabled: true // 默认启用声音提醒
             }];
         } else {
             // 默认设置
@@ -1117,6 +1162,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     backgroundImageOpacity = parseInt(section.querySelector(`#background-image-opacity-${index}`).value) || 80;
                 }
             }
+            
+            // 获取提醒设置
+            const warningEnabled = section.querySelector(`#warning-enabled-${index}`) ? section.querySelector(`#warning-enabled-${index}`).checked : true;
+            const warningSeconds = section.querySelector(`#warning-seconds-${index}`) ? parseInt(section.querySelector(`#warning-seconds-${index}`).value) || 60 : 60;
+            const soundEnabled = section.querySelector(`#sound-enabled-${index}`) ? section.querySelector(`#sound-enabled-${index}`).checked : true;
 
             newTasks.push({ 
                 days, 
@@ -1130,7 +1180,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundColor, 
                 backgroundImage, 
                 backgroundEnabled, 
-                backgroundImageOpacity 
+                backgroundImageOpacity,
+                warningEnabled,
+                warningSeconds,
+                soundEnabled
             });
         });
         
@@ -1189,7 +1242,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
                 backgroundEnabled: true, // 默认启用背景
-                backgroundImageOpacity: 80 // 默认图片背景透明度
+                backgroundImageOpacity: 80, // 默认图片背景透明度
+                warningEnabled: true, // 默认启用提醒
+                warningSeconds: 60, // 默认提前60秒提醒
+                soundEnabled: true // 默认启用声音提醒
             }];
         }
         
@@ -1214,7 +1270,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
                 backgroundEnabled: true, // 默认启用背景
-                backgroundImageOpacity: 80 // 默认图片背景透明度
+                backgroundImageOpacity: 80, // 默认图片背景透明度
+                warningEnabled: true, // 默认启用提醒
+                warningSeconds: 60, // 默认提前60秒提醒
+                soundEnabled: true // 默认启用声音提醒
             },
             { 
                 days: 0, 
@@ -1228,7 +1287,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 backgroundColor: '#000000', // 默认背景颜色
                 backgroundImage: '', // 默认背景图片
                 backgroundEnabled: true, // 默认启用背景
-                backgroundImageOpacity: 80 // 默认图片背景透明度
+                backgroundImageOpacity: 80, // 默认图片背景透明度
+                warningEnabled: true, // 默认启用提醒
+                warningSeconds: 60, // 默认提前60秒提醒
+                soundEnabled: true // 默认启用声音提醒
             }
         ];
         
@@ -1253,6 +1315,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Switch to next task
     function switchToNextTask() {
+        // 停止当前任务的警告提醒
+        stopWarning();
+        
         currentTaskIndex++;
         
         if (currentTaskIndex < tasks.length) {
@@ -1370,11 +1435,22 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(timerInterval);
             isRunning = false;
             
+            // 停止警告提醒
+            stopWarning();
+            
             addLog(`${i18n.current === 'zh' ? '任务' : 'Task'} ${currentTaskIndex + 1} ${getT('log_task_finished')}`, 'success');
             
             // 切换到下一个任务
             switchToNextTask();
             return;
+        }
+        
+        // 检查是否需要启动警告提醒
+        if (tasks.length > 0 && currentTaskIndex < tasks.length) {
+            const currentTask = tasks[currentTaskIndex];
+            if (currentTask.warningEnabled && totalSeconds <= currentTask.warningSeconds && !isWarningActive) {
+                startWarning(currentTask);
+            }
         }
         
         totalSeconds--;
@@ -1449,9 +1525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addTaskBtn.addEventListener('click', addTask);
 
     // 全屏按钮事件监听
-    if (fullscreenBtn) {
-        fullscreenBtn.addEventListener('click', toggleFullscreenTimer);
-    }
+
 
     startButton.addEventListener('click', () => {
         console.log('开始按钮点击，当前状态:', { isRunning, totalSeconds, currentTaskIndex: currentTaskIndex + 1 });
@@ -1469,6 +1543,10 @@ document.addEventListener('DOMContentLoaded', () => {
     pauseButton.addEventListener('click', () => {
         clearInterval(timerInterval);
         isRunning = false;
+        
+        // 停止警告提醒
+        stopWarning();
+        
         console.log('倒计时已暂停'); // 调试信息
         bcPost({ type: 'PAUSE', remainingSeconds: totalSeconds });
         pushStateToCloud({});
@@ -1477,6 +1555,10 @@ document.addEventListener('DOMContentLoaded', () => {
     resetButton.addEventListener('click', () => {
         clearInterval(timerInterval);
         isRunning = false;
+        
+        // 停止警告提醒
+        stopWarning();
+        
         currentTaskIndex = 0;
         totalSeconds = tasks[0].days * 24 * 3600 + tasks[0].hours * 3600 + tasks[0].minutes * 60 + tasks[0].seconds;
         console.log('重置倒计时，总秒数:', totalSeconds); // 调试信息
@@ -1585,91 +1667,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 全屏功能
-    function toggleFullscreen() {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-            isFullscreen = false;
-            fullscreenBtn.textContent = i18n.current === 'zh' ? '全屏' : getT('btn_fullscreen');
-            fullscreenBtn.title = i18n.current === 'zh' ? '全屏显示' : getT('btn_fullscreen');
-        } else {
-            document.documentElement.requestFullscreen();
-            isFullscreen = true;
-            fullscreenBtn.textContent = i18n.current === 'zh' ? '退出全屏' : (getT('btn_fullscreen') + ' Off');
-            fullscreenBtn.title = i18n.current === 'zh' ? '退出全屏' : (getT('btn_fullscreen') + ' Off');
-        }
-        addLog(isFullscreen ? getT('log_fullscreen_on') : getT('log_fullscreen_off'), 'info');
-    }
 
-    // 切换倒计时器全屏显示
-    function toggleFullscreenTimer() {
-        const timerContainer = document.querySelector('.timer-container');
-        const appContainer = document.querySelector('.app-container');
-        const timerControls = document.querySelector('.timer-controls');
-        
-        if (!timerContainer) return;
-        
-        if (isFullscreen) {
-            // 退出全屏模式
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            }
-            
-            // 移除全屏样式
-            timerWindow.classList.remove('fullscreen-timer');
-            if (document.querySelector('.fullscreen-exit')) {
-                document.querySelector('.fullscreen-exit').remove();
-            }
-            
-            // 恢复原始状态
-            appContainer.style.display = '';
-            timerWindow.style.display = '';
-            
-            // 显示控制按钮
-            if (timerControls) {
-                timerControls.style.display = '';
-            }
-            
-            fullscreenBtn.textContent = i18n.current === 'zh' ? '全屏' : getT('btn_fullscreen');
-            fullscreenBtn.title = i18n.current === 'zh' ? '全屏显示' : getT('btn_fullscreen');
-            isFullscreen = false;
-        } else {
-            // 进入全屏模式
-            timerWindow.classList.add('fullscreen-timer');
-            
-            // 隐藏控制按钮
-            if (timerControls) {
-                timerControls.style.display = 'none';
-            }
-            
-            // 创建退出全屏按钮
-            const exitBtn = document.createElement('button');
-            exitBtn.className = 'fullscreen-exit';
-            exitBtn.innerHTML = '×';
-            exitBtn.title = i18n.current === 'zh' ? '退出全屏' : 'Exit Fullscreen';
-            exitBtn.addEventListener('click', toggleFullscreenTimer);
-            timerWindow.appendChild(exitBtn);
-            
-            // 请求浏览器全屏
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error('全屏请求被拒绝:', err);
-            });
-            
-            fullscreenBtn.textContent = i18n.current === 'zh' ? '退出全屏' : 'Exit Fullscreen';
-            fullscreenBtn.title = i18n.current === 'zh' ? '退出全屏' : 'Exit Fullscreen';
-            isFullscreen = true;
-        }
-        
-        addLog(isFullscreen ? getT('log_fullscreen_on') : getT('log_fullscreen_off'), 'info');
-    }
-
-    // 监听全屏状态变化
-    document.addEventListener('fullscreenchange', () => {
-        // 如果用户通过浏览器自带功能退出全屏，我们也需要更新UI
-        if (!document.fullscreenElement && isFullscreen) {
-            toggleFullscreenTimer();
-        }
-    });
 
     // 初始化
     loadSettings();
@@ -2077,4 +2075,169 @@ document.addEventListener('DOMContentLoaded', () => {
         addLog(getT('log_init_done'), 'info');
         applyTranslations();
     }, 500);
+    
+    // ===== 倒计时警告提醒功能 =====
+    
+    // 启动警告提醒
+    function startWarning(currentTask) {
+        if (isWarningActive) return;
+        
+        isWarningActive = true;
+        
+        // 添加警告样式类
+        document.body.classList.add('timer-warning');
+        if (timerContainer) {
+            timerContainer.classList.add('timer-warning');
+        }
+        
+        // 显示声音提醒图标（只有在启用声音时才显示）
+        if (soundReminder) {
+            soundReminder.style.display = currentTask.soundEnabled ? 'flex' : 'none';
+        }
+        
+        // 只有在启用声音时才播放警告音频
+        if (currentTask.soundEnabled) {
+            playWarningSound();
+        }
+        
+        // 添加日志
+        const warningText = currentTask.soundEnabled ? 
+            '倒计时即将结束，已启动视觉和声音提醒' : 
+            '倒计时即将结束，已启动视觉提醒';
+        addLog(warningText, 'warning');
+    }
+    
+    // 停止警告提醒
+    function stopWarning() {
+        if (!isWarningActive) return;
+        
+        isWarningActive = false;
+        
+        // 移除警告样式类
+        document.body.classList.remove('timer-warning');
+        if (timerContainer) {
+            timerContainer.classList.remove('timer-warning');
+        }
+        
+        // 隐藏声音提醒图标
+        if (soundReminder) {
+            soundReminder.style.display = 'none';
+        }
+        
+        // 停止音频
+        stopWarningSound();
+    }
+    
+    // 播放警告声音
+    function playWarningSound() {
+        try {
+            // 创建音频上下文（如果浏览器支持）
+            if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+                const AudioContextClass = AudioContext || webkitAudioContext;
+                const audioContext = new AudioContextClass();
+                
+                // 创建振荡器生成警告音
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // 设置音频参数
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                
+                // 每2秒重复一次
+                setTimeout(() => {
+                    if (isWarningActive) {
+                        playWarningSound();
+                    }
+                }, 2000);
+            }
+        } catch (error) {
+            console.log('音频播放失败，使用备用方案:', error);
+            // 备用方案：使用现有的音频文件
+            playBackupWarningSound();
+        }
+    }
+    
+    // 播放备用警告声音
+    function playBackupWarningSound() {
+        try {
+            if (!warningAudio) {
+                warningAudio = new Audio('timeisup.mp3');
+                warningAudio.volume = 0.5;
+            }
+            
+            if (warningAudio.readyState >= 2) {
+                warningAudio.play().catch(error => {
+                    console.log('备用音频播放失败:', error);
+                });
+                
+                // 每3秒重复一次
+                setTimeout(() => {
+                    if (isWarningActive) {
+                        playBackupWarningSound();
+                    }
+                }, 3000);
+            }
+        } catch (error) {
+            console.log('备用音频播放失败:', error);
+        }
+    }
+    
+    // 停止警告声音
+    function stopWarningSound() {
+        try {
+            if (warningAudio) {
+                warningAudio.pause();
+                warningAudio.currentTime = 0;
+            }
+        } catch (error) {
+            console.log('停止音频失败:', error);
+        }
+    }
+    
+    // 声音提醒图标点击事件
+    if (soundReminder) {
+        soundReminder.addEventListener('click', () => {
+            stopWarning();
+        });
+    }
+    
+    // 重置时也要停止警告
+    const originalResetFunction = window.resetTimer;
+    if (typeof originalResetFunction === 'function') {
+        window.resetTimer = function() {
+            stopWarning();
+            return originalResetFunction.apply(this, arguments);
+        };
+    }
+    
+    // ===== 提醒设置控制函数 =====
+    
+    // 切换提醒设置显示/隐藏
+    window.toggleWarningSettings = function(taskIndex) {
+        const warningOptions = document.getElementById(`warning-options-${taskIndex}`);
+        const warningEnabled = document.getElementById(`warning-enabled-${taskIndex}`);
+        
+        if (warningOptions && warningEnabled) {
+            warningOptions.style.display = warningEnabled.checked ? 'block' : 'none';
+        }
+    };
+    
+    // 页面加载完成后为所有提醒设置复选框添加事件监听器
+    document.addEventListener('change', function(event) {
+        if (event.target.id && event.target.id.startsWith('warning-enabled-')) {
+            const taskIndex = event.target.id.replace('warning-enabled-', '');
+            toggleWarningSettings(taskIndex);
+        }
+    });
 }); 

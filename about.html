@@ -8,6 +8,7 @@
     <meta name="author" content="Timer App">
     <meta name="robots" content="index, follow">
     <title>About Timer App - Our Mission to Simplify Time Management | Free Online Timer</title>
+    <link rel="icon" type="image/png" href="facicon.png">
     <link rel="canonical" href="https://yourdomain.com/about.html">
     
     <!-- Open Graph Meta Tags -->
@@ -30,10 +31,25 @@
             background: #f8f9fa;
         }
         
+        /* 引入统一的暖色调主题样式 */
+        @import url('styles.css?v=2.7');
+        
         .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+        
+        /* 应用暖色调主题样式 */
+        .about-page .container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 240, 0.9));
+            border-radius: 20px;
+            border: 2px solid rgba(255, 165, 0, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(255, 165, 0, 0.15),
+                0 10px 20px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            padding: 2rem;
         }
         
         header {
@@ -343,7 +359,7 @@
         }
     </style>
 </head>
-<body>
+<body class="about-page">
     <header>
         <nav class="container">
             <a href="index.html" class="logo">⏰ Timer App</a>

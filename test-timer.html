@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>倒计时提醒测试</title>
+    <link rel="icon" type="image/png" href="facicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        
+        .test-timer {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 2rem 0;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .test-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .test-controls button {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .test-controls button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .test-info {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>倒计时提醒测试</h1>
+        <div class="test-info">
+            <p>设置一个少于1分钟的倒计时来测试提醒功能</p>
+            <p>当剩余时间少于1分钟时，页面会开始闪烁提醒</p>
+        </div>
+        
+        <div class="test-timer" id="test-timer">00:00</div>
+        
+        <div class="test-controls">
+            <button onclick="setTime(30)">设置30秒</button>
+            <button onclick="setTime(45)">设置45秒</button>
+            <button onclick="setTime(60)">设置1分钟</button>
+            <button onclick="startTimer()">开始</button>
+            <button onclick="pauseTimer()">暂停</button>
+            <button onclick="resetTimer()">重置</button>
+        </div>
+        
+        <div class="test-info">
+            <p id="status">准备就绪</p>
+        </div>
+    </div>
+
+    <script>
+        let totalSeconds = 0;
+        let isRunning = false;
+        let timerInterval = null;
+        let isWarningActive = false;
+        
+        const testTimer = document.getElementById('test-timer');
+        const status = document.getElementById('status');
+        
+        function setTime(seconds) {
+            totalSeconds = seconds;
+            updateDisplay();
+            status.textContent = `已设置 ${seconds} 秒`;
+        }
+        
+        function startTimer() {
+            if (totalSeconds <= 0) {
+                alert('请先设置时间！');
+                return;
+            }
+            
+            if (!isRunning) {
+                isRunning = true;
+                timerInterval = setInterval(countdown, 1000);
+                status.textContent = '倒计时运行中...';
+            }
+        }
+        
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                stopWarning();
+                status.textContent = '已暂停';
+            }
+        }
+        
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            totalSeconds = 0;
+            stopWarning();
+            updateDisplay();
+            status.textContent = '已重置';
+        }
+        
+        function countdown() {
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                isRunning = false;
+                stopWarning();
+                status.textContent = '倒计时结束！';
+                return;
+            }
+            
+            // 检查是否需要启动警告提醒（剩余时间少于1分钟）
+            if (totalSeconds <= 60 && !isWarningActive) {
+                startWarning();
+            }
+            
+            totalSeconds--;
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            testTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 启动警告提醒
+        function startWarning() {
+            if (isWarningActive) return;
+            
+            isWarningActive = true;
+            
+            // 添加警告样式类
+            document.body.classList.add('timer-warning');
+            document.querySelector('.test-container').classList.add('timer-warning');
+            
+            status.textContent = '⚠️ 倒计时即将结束！页面开始闪烁提醒';
+        }
+        
+        // 停止警告提醒
+        function stopWarning() {
+            if (!isWarningActive) return;
+            
+            isWarningActive = false;
+            
+            // 移除警告样式类
+            document.body.classList.remove('timer-warning');
+            document.querySelector('.test-container').classList.remove('timer-warning');
+        }
+        
+        // 初始化显示
+        updateDisplay();
+    </script>
+</body>
+</html> 

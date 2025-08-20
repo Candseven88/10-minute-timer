@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>自定义倒计时器</title>
+    <link rel="icon" type="image/png" href="facicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+            <link rel="stylesheet" href="styles.css?v=2.7">
 </head>
 <body>
+    <!-- 声音提醒图标 -->
+    <div id="sound-reminder" class="sound-reminder" style="display: none;" title="点击关闭声音提醒">
+        🔊
+    </div>
+    
     <div class="app-container">
         <!-- 窗口切换按钮 -->
         <div class="window-switcher">
@@ -34,28 +40,28 @@
                 </div>
                 <div class="timer-display">
                     <div class="time-unit">
-                        <div class="label" id="label-days">Days</div>
+                        <span class="label" id="label-days">Days</span>
                         <div class="flip-clock">
                             <div class="digit">00</div>
                         </div>
                     </div>
                     <div class="separator">:</div>
                     <div class="time-unit">
-                        <div class="label" id="label-hours">Hours</div>
+                        <span class="label" id="label-hours">Hours</span>
                         <div class="flip-clock">
                             <div class="digit">00</div>
                         </div>
                     </div>
                     <div class="separator">:</div>
                     <div class="time-unit">
-                        <div class="label" id="label-minutes">Minutes</div>
+                        <span class="label" id="label-minutes">Minutes</span>
                         <div class="flip-clock">
                             <div class="digit">00</div>
                         </div>
                     </div>
                     <div class="separator">:</div>
                     <div class="time-unit">
-                        <div class="label" id="label-seconds">Seconds</div>
+                        <span class="label" id="label-seconds">Seconds</span>
                         <div class="flip-clock">
                             <div class="digit">00</div>
                         </div>
@@ -71,7 +77,6 @@
                 <button id="start">开始</button>
                 <button id="pause">暂停</button>
                 <button id="reset">重置</button>
-                <button id="fullscreen" title="全屏显示">全屏</button>
             </div>
         </div>
 

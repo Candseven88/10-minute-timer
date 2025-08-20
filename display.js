@@ -2,8 +2,8 @@
 	const i18n = {
 		current: localStorage.getItem('timerLang') || 'en',
 		dict: {
-			zh: { title:'倒计时器', task:'任务', footer:'专注工作，高效生活', days:'天', hours:'时', minutes:'分', seconds:'秒', currentTask:'当前任务', enterFullscreen:'全屏', exitFullscreen:'退出全屏', connectionLost:'连接已断开，正在重连...', connectionRestored:'连接已恢复' },
-			en: { title:'Countdown', task:'Task', footer:'Focus on work, live efficiently', days:'Days', hours:'Hours', minutes:'Minutes', seconds:'Seconds', currentTask:'Current Task', enterFullscreen:'Fullscreen', exitFullscreen:'Exit Fullscreen', connectionLost:'Connection lost, reconnecting...', connectionRestored:'Connection restored' }
+				zh: { title:'倒计时器', task:'任务', footer:'专注工作，高效生活', days:'天', hours:'时', minutes:'分', seconds:'秒', currentTask:'当前任务', connectionLost:'连接已断开，正在重连...', connectionRestored:'连接已恢复' },
+	en: { title:'Countdown', task:'Task', footer:'Focus on work, live efficiently', days:'Days', hours:'Hours', minutes:'Minutes', seconds:'Seconds', currentTask:'Current Task', connectionLost:'Connection lost, reconnecting...', connectionRestored:'Connection restored' }
 		}
 	};
 	function t(k){
@@ -21,7 +21,7 @@
 	const lblHours = document.getElementById('viewer-label-hours');
 	const lblMinutes = document.getElementById('viewer-label-minutes');
 	const lblSeconds = document.getElementById('viewer-label-seconds');
-	const fsBtn = document.getElementById('viewer-fullscreen');
+
 	const timerWindow = document.getElementById('timer-window');
 
 	// 添加状态通知元素
@@ -59,13 +59,17 @@
 	let baseStartedAtMs = null;
 	let baseRemainingAtStartSec = 0;
 	let updateTimer = null;
-	let isFs = false;
+
 	let pollTimer = null;
 	let lastServerNow = null;
 	let connectionFailed = false;
 	let reconnectAttempts = 0;
 	let maxReconnectAttempts = 10;
 	let reconnectDelay = 500;
+	
+	// 提醒相关变量
+	let isWarningActive = false;
+	let warningAudio = null;
 
 	// cross-tab sync（仅同源标签页使用）
 	const bc = 'BroadcastChannel' in window ? new BroadcastChannel('timer_control') : null;
@@ -78,8 +82,29 @@
 			try { tasks = JSON.parse(saved).tasks || []; } catch(e){ tasks = []; }
 		}
 		if(!tasks || tasks.length===0){
-			tasks = [ { days:0,hours:0,minutes:10,seconds:0, title:t('title'), taskName:`${t('task')} 1`, footer:t('footer'), backgroundType:'color', backgroundColor:'#000', backgroundEnabled:true, backgroundImage:'', backgroundImageOpacity:80 } ];
+			tasks = [ { 
+				days:0,hours:0,minutes:10,seconds:0, 
+				title:t('title'), 
+				taskName:`${t('task')} 1`, 
+				footer:t('footer'), 
+				backgroundType:'color', 
+				backgroundColor:'#000', 
+				backgroundEnabled:true, 
+				backgroundImage:'', 
+				backgroundImageOpacity:80,
+				warningEnabled: true, // 默认启用提醒
+				warningSeconds: 60, // 默认提前60秒提醒
+				soundEnabled: true // 默认启用声音提醒
+			} ];
 		}
+		
+		// 为现有任务添加默认的提醒设置（如果不存在）
+		tasks.forEach(task => {
+			if (task.warningEnabled === undefined) task.warningEnabled = true;
+			if (task.warningSeconds === undefined) task.warningSeconds = 60;
+			if (task.soundEnabled === undefined) task.soundEnabled = true;
+		});
+		
 		currentTaskIndex = 0;
 		const t0 = tasks[0];
 		idleSeconds = t0.days*86400 + t0.hours*3600 + t0.minutes*60 + t0.seconds;
@@ -175,6 +200,9 @@
 		
 		// 更新页面标题，方便用户在后台查看
 		document.title = `${pad(hours)}:${pad(minutes)}:${pad(seconds)} - ${tasks[currentTaskIndex]?.title || t('title')}`;
+		
+		// 检查是否需要启动提醒
+		checkWarning(sec);
 	}
 
 	function stopUpdater(){ if(updateTimer){ clearInterval(updateTimer); updateTimer=null; } }
@@ -186,9 +214,135 @@
 			
 			// 当倒计时结束时，自动拉取新状态
 			if(sec <= 0 && baseStartedAtMs !== null) {
+				stopWarning(); // 停止提醒
 				pullFromCloud(true);
 			}
 		}, 250);
+	}
+	
+	// 检查是否需要启动提醒
+	function checkWarning(seconds) {
+		if (tasks.length > 0 && currentTaskIndex < tasks.length) {
+			const currentTask = tasks[currentTaskIndex];
+			if (currentTask.warningEnabled && seconds <= currentTask.warningSeconds && !isWarningActive) {
+				startWarning(currentTask);
+			}
+		}
+	}
+	
+	// 启动警告提醒
+	function startWarning(currentTask) {
+		if (isWarningActive) return;
+		
+		isWarningActive = true;
+		
+		// 添加警告样式类
+		document.body.classList.add('timer-warning');
+		const timerContainer = document.querySelector('.timer-container');
+		if (timerContainer) {
+			timerContainer.classList.add('timer-warning');
+		}
+		
+		// 只有在启用声音时才播放警告音频
+		if (currentTask.soundEnabled) {
+			playWarningSound();
+		}
+		
+		console.log('分享链接页面：倒计时即将结束，已启动提醒');
+	}
+	
+	// 停止警告提醒
+	function stopWarning() {
+		if (!isWarningActive) return;
+		
+		isWarningActive = false;
+		
+		// 移除警告样式类
+		document.body.classList.remove('timer-warning');
+		const timerContainer = document.querySelector('.timer-container');
+		if (timerContainer) {
+			timerContainer.classList.remove('timer-warning');
+		}
+		
+		// 停止音频
+		stopWarningSound();
+	}
+	
+	// 播放警告声音
+	function playWarningSound() {
+		try {
+			// 创建音频上下文（如果浏览器支持）
+			if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+				const AudioContextClass = AudioContext || webkitAudioContext;
+				const audioContext = new AudioContextClass();
+				
+				// 创建振荡器生成警告音
+				const oscillator = audioContext.createOscillator();
+				const gainNode = audioContext.createGain();
+				
+				oscillator.connect(gainNode);
+				gainNode.connect(audioContext.destination);
+				
+				// 设置音频参数
+				oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+				oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+				oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.2);
+				
+				gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+				gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+				
+				oscillator.start(audioContext.currentTime);
+				oscillator.stop(audioContext.currentTime + 0.3);
+				
+				// 每2秒重复一次
+				setTimeout(() => {
+					if (isWarningActive) {
+						playWarningSound();
+					}
+				}, 2000);
+			}
+		} catch (error) {
+			console.log('音频播放失败，使用备用方案:', error);
+			// 备用方案：使用现有的音频文件
+			playBackupWarningSound();
+		}
+	}
+	
+	// 播放备用警告声音
+	function playBackupWarningSound() {
+		try {
+			if (!warningAudio) {
+				warningAudio = new Audio('timeisup.mp3');
+				warningAudio.volume = 0.5;
+			}
+			
+			if (warningAudio.readyState >= 2) {
+				warningAudio.play().catch(error => {
+					console.log('备用音频播放失败:', error);
+				});
+				
+				// 每3秒重复一次
+				setTimeout(() => {
+					if (isWarningActive) {
+						playBackupWarningSound();
+					}
+				}, 3000);
+			}
+		} catch (error) {
+			console.log('备用音频播放失败:', error);
+		}
+	}
+	
+	// 停止警告声音
+	function stopWarningSound() {
+		try {
+			if (warningAudio) {
+				warningAudio.pause();
+				warningAudio.currentTime = 0;
+			}
+		} catch (error) {
+			console.log('停止音频失败:', error);
+		}
 	}
 
 	async function pullFromCloud(forceRefresh = false){
@@ -257,6 +411,13 @@
 				tasks = Array.isArray(data.tasks) ? data.tasks : tasks;
 				currentTaskIndex = typeof data.currentTaskIndex==='number' ? data.currentTaskIndex : currentTaskIndex;
 				
+				// 为从云端获取的任务添加默认的提醒设置（如果不存在）
+				tasks.forEach(task => {
+					if (task.warningEnabled === undefined) task.warningEnabled = true;
+					if (task.warningSeconds === undefined) task.warningSeconds = 60;
+					if (task.soundEnabled === undefined) task.soundEnabled = true;
+				});
+				
 				if(data.isRunning){
 					// 用服务端剩余 + 半 RTT 校正基线
 					const srvRemain = typeof data.calcRemainingSeconds==='number' ? data.calcRemainingSeconds : (typeof data.remainingSeconds==='number'? data.remainingSeconds : baseRemainingAtStartSec);
@@ -309,26 +470,12 @@
 		pullFromCloud(true);
 	}
 
-	function enterFullscreen(){
-		if(!timerWindow) return;
-		timerWindow.classList.add('fullscreen-timer');
-		document.documentElement.requestFullscreen?.();
-	}
-	function exitFullscreen(){
-		timerWindow?.classList.remove('fullscreen-timer');
-		if(document.fullscreenElement){ document.exitFullscreen?.(); }
-	}
 
-	fsBtn?.addEventListener('click', ()=>{
-		if(timerWindow?.classList.contains('fullscreen-timer')){ exitFullscreen(); isFs=false; fsBtn.title = t('enterFullscreen'); }
-		else { enterFullscreen(); isFs=true; fsBtn.title = t('exitFullscreen'); }
-	});
 
-	document.addEventListener('fullscreenchange', ()=>{
-		isFs = !!document.fullscreenElement;
-		if(!isFs){ timerWindow?.classList.remove('fullscreen-timer'); }
-		fsBtn.title = isFs ? t('exitFullscreen') : t('enterFullscreen');
-	});
+
+
+
+
 
 	// storage 与 BroadcastChannel（本地开发时可用）
 	window.addEventListener('storage', (e)=>{
@@ -351,14 +498,7 @@
 		}
 	});
 
-	// 添加键盘快捷键
-	document.addEventListener('keydown', (e) => {
-		// F键触发全屏
-		if(e.key === 'f' || e.key === 'F') {
-			if(isFs) { exitFullscreen(); isFs=false; }
-			else { enterFullscreen(); isFs=true; }
-		}
-	});
+
 
 	// 添加动画效果
 	function addAnimationStyles() {

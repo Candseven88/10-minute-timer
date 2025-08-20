@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Countdown Display</title>
+    <link rel="icon" type="image/png" href="facicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+            <link rel="stylesheet" href="styles.css?v=2.7">
     <style>
         .viewer-header {
             position: fixed;
@@ -93,12 +94,12 @@
         }
     </style>
 </head>
-<body>
+<body class="display-page">
     <div class="app-container">
         <div id="timer-window" class="window active">
             <div class="viewer-header">
                 <a href="index.html" class="viewer-btn home-btn" title="返回主页/Return Home">🏠</a>
-                <button id="viewer-fullscreen" class="viewer-btn" title="全屏/Fullscreen">⛶</button>
+
             </div>
             <div class="timer-container">
                 <h1 id="viewer-title">倒计时器</h1>
@@ -107,28 +108,21 @@
                 </div>
                 <div class="timer-display">
                     <div class="time-unit">
-                        <div class="label" id="viewer-label-days">Days</div>
+                        <span class="label" id="viewer-label-days">Days</span>
                         <div class="flip-clock">
                             <div class="digit" id="viewer-days">00</div>
                         </div>
                     </div>
                     <div class="separator">:</div>
                     <div class="time-unit">
-                        <div class="label" id="viewer-label-hours">Hours</div>
+                        <span class="label" id="viewer-label-hours">Hours</span>
                         <div class="flip-clock">
                             <div class="digit" id="viewer-hours">00</div>
                         </div>
                     </div>
                     <div class="separator">:</div>
                     <div class="time-unit">
-                        <div class="label" id="viewer-label-minutes">Minutes</div>
-                        <div class="flip-clock">
-                            <div class="digit" id="viewer-minutes">00</div>
-                        </div>
-                    </div>
-                    <div class="separator">:</div>
-                    <div class="time-unit">
-                        <div class="label" id="viewer-label-seconds">Seconds</div>
+                        <span class="label" id="viewer-label-seconds">Seconds</span>
                         <div class="flip-clock">
                             <div class="digit" id="viewer-seconds">00</div>
                         </div>
