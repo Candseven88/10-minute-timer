@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Buttons Test - Timer App</title>
+    <link rel="icon" type="image/png" href="facicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        
+        .test-header {
+            margin-bottom: 2rem;
+        }
+        
+        .test-content {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+        
+        .test-content p {
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+        
+        .scroll-content {
+            height: 800px;
+            overflow-y: auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .scroll-content h3 {
+            margin: 2rem 0 1rem 0;
+            color: #ff6b35;
+        }
+        
+        .scroll-content p {
+            margin: 1rem 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🎯 Floating Buttons Test</h1>
+            <p>Test the floating share and feedback buttons functionality</p>
+        </div>
+        
+        <div class="test-content">
+            <h2>What to Test</h2>
+            <p>1. <strong>Share Button (📤)</strong>: Click to open share menu with social media options</p>
+            <p>2. <strong>Feedback Button (💬)</strong>: Click to open email client with feedback template</p>
+            <p>3. <strong>Animations</strong>: Observe the floating animations and hover effects</p>
+            <p>4. <strong>Responsiveness</strong>: Test on different screen sizes</p>
+        </div>
+        
+        <div class="scroll-content">
+            <h3>Scroll Down to Test Floating Buttons</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            
+            <h3>Section 1</h3>
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            
+            <h3>Section 2</h3>
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+            
+            <h3>Section 3</h3>
+            <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+            
+            <h3>Section 4</h3>
+            <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
+            
+            <h3>Section 5</h3>
+            <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.</p>
+            
+            <h3>Section 6</h3>
+            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.</p>
+            
+            <h3>Section 7</h3>
+            <p>Similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.</p>
+            
+            <h3>Section 8</h3>
+            <p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus.</p>
+            
+            <h3>Section 9</h3>
+            <p>Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae.</p>
+            
+            <h3>Section 10</h3>
+            <p>Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.</p>
+        </div>
+        
+        <div class="test-content">
+            <h2>Test Results</h2>
+            <p>✅ Floating buttons should be visible in the bottom-right corner</p>
+            <p>✅ Share button should open a menu with social media options</p>
+            <p>✅ Feedback button should open email client</p>
+            <p>✅ Buttons should have smooth floating animations</p>
+            <p>✅ Hover effects should work properly</p>
+        </div>
+    </div>
+
+    <!-- 浮动操作按钮 -->
+    <div class="floating-action-buttons">
+        <!-- 分享按钮 -->
+        <button class="floating-button share-button" id="share-button" title="Share App">
+            📤
+        </button>
+        
+        <!-- 反馈按钮 -->
+        <button class="floating-button feedback-button" id="feedback-button" title="Send Feedback">
+            💬
+        </button>
+        
+        <!-- 分享菜单 -->
+        <div class="share-menu" id="share-menu">
+            <h3>Share Timer App</h3>
+            <div class="share-options">
+                <a href="#" class="share-option facebook" id="share-facebook">
+                    <i>📘</i>
+                    <span>Facebook</span>
+                </a>
+                <a href="#" class="share-option twitter" id="share-twitter">
+                    <i>🐦</i>
+                    <span>Twitter</span>
+                </a>
+                <a href="#" class="share-option linkedin" id="share-linkedin">
+                    <i>💼</i>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="#" class="share-option whatsapp" id="share-whatsapp">
+                    <i>📱</i>
+                    <span>WhatsApp</span>
+                </a>
+                <a href="#" class="share-option telegram" id="share-telegram">
+                    <i>📬</i>
+                    <span>Telegram</span>
+                </a>
+                <a href="#" class="share-option email" id="share-email">
+                    <i>📧</i>
+                    <span>Email</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 浮动按钮功能
+        const shareButton = document.getElementById('share-button');
+        const shareMenu = document.getElementById('share-menu');
+        
+        if (shareButton && shareMenu) {
+            // 分享按钮点击事件
+            shareButton.addEventListener('click', () => {
+                shareMenu.classList.toggle('active');
+            });
+            
+            // 点击其他地方关闭分享菜单
+            document.addEventListener('click', (event) => {
+                if (!shareButton.contains(event.target) && !shareMenu.contains(event.target)) {
+                    shareMenu.classList.remove('active');
+                }
+            });
+            
+            // 分享到Facebook
+            document.getElementById('share-facebook').addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = 'https://10-minute-timer.website/';
+                const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+                const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            });
+            
+            // 分享到Twitter
+            document.getElementById('share-twitter').addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = 'https://10-minute-timer.website/';
+                const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+                const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            });
+            
+            // 分享到LinkedIn
+            document.getElementById('share-linkedin').addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = 'https://10-minute-timer.website/';
+                const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+                const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+                window.open(shareUrl, '_blank', 'width=600,height=400');
+            });
+            
+            // 分享到WhatsApp
+            document.getElementById('share-whatsapp').addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = 'https://10-minute-timer.website/';
+                const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+                const shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+                window.open(shareUrl, '_blank');
+            });
+            
+            // 分享到Telegram
+            document.getElementById('share-telegram').addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = 'https://10-minute-timer.website/';
+                const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+                const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+                window.open(shareUrl, '_blank');
+            });
+            
+            // 分享到Email
+            document.getElementById('share-email').addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = 'https://10-minute-timer.website/';
+                const subject = 'Amazing Free Online Timer App';
+                const body = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more.\n\nWebsite: ' + url + '\n\n⏰✨';
+                const shareUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = shareUrl;
+            });
+        }
+        
+        // 反馈按钮功能
+        const feedbackButton = document.getElementById('feedback-button');
+        
+        if (feedbackButton) {
+            feedbackButton.addEventListener('click', () => {
+                const subject = 'Timer App Feedback';
+                const body = 'Hi,\n\nI would like to share my feedback about the Timer App.\n\n[Your feedback here]\n\nBest regards,\n[Your name]';
+                const mailtoUrl = `mailto:candseven2015@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoUrl;
+                shareMenu.classList.remove('active');
+            });
+        }
+        
+        // 添加一些交互反馈
+        console.log('🎯 Floating buttons test page loaded successfully!');
+        console.log('📤 Share button and 💬 feedback button are ready for testing.');
+    </script>
+</body>
+</html> 

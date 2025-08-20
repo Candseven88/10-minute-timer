@@ -2240,4 +2240,91 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleWarningSettings(taskIndex);
         }
     });
+    
+    // ===== 浮动按钮功能 =====
+    
+    // 分享按钮功能
+    const shareButton = document.getElementById('share-button');
+    const shareMenu = document.getElementById('share-menu');
+    
+    if (shareButton && shareMenu) {
+        // 分享按钮点击事件
+        shareButton.addEventListener('click', () => {
+            shareMenu.classList.toggle('active');
+        });
+        
+        // 点击其他地方关闭分享菜单
+        document.addEventListener('click', (event) => {
+            if (!shareButton.contains(event.target) && !shareMenu.contains(event.target)) {
+                shareMenu.classList.remove('active');
+            }
+        });
+        
+        // 分享到Facebook
+        document.getElementById('share-facebook').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = 'https://10-minute-timer.website/';
+            const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+            const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+        });
+        
+        // 分享到Twitter
+        document.getElementById('share-twitter').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = 'https://10-minute-timer.website/';
+            const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+            const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+        });
+        
+        // 分享到LinkedIn
+        document.getElementById('share-linkedin').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = 'https://10-minute-timer.website/';
+            const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+            const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+        });
+        
+        // 分享到WhatsApp
+        document.getElementById('share-whatsapp').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = 'https://10-minute-timer.website/';
+            const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+            const shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+            window.open(shareUrl, '_blank');
+        });
+        
+        // 分享到Telegram
+        document.getElementById('share-telegram').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = 'https://10-minute-timer.website/';
+            const text = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more. ⏰✨';
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            window.open(shareUrl, '_blank');
+        });
+        
+        // 分享到Email
+        document.getElementById('share-email').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = 'https://10-minute-timer.website/';
+            const subject = 'Amazing Free Online Timer App';
+            const body = 'Check out this amazing free online timer app! Perfect for work, exercise, cooking, and more.\n\nWebsite: ' + url + '\n\n⏰✨';
+            const shareUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = shareUrl;
+        });
+    }
+    
+    // 反馈按钮功能
+    const feedbackButton = document.getElementById('feedback-button');
+    
+    if (feedbackButton) {
+        feedbackButton.addEventListener('click', () => {
+            const subject = 'Timer App Feedback';
+            const body = 'Hi,\n\nI would like to share my feedback about the Timer App.\n\n[Your feedback here]\n\nBest regards,\n[Your name]';
+            const mailtoUrl = `mailto:candseven2015@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoUrl;
+        });
+    }
 }); 
