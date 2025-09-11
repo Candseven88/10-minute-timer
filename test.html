@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sync Timer Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        input {
+            padding: 0.5rem;
+            margin: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #status {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .error { background: #fff3cd; color: #856404; }
+        #log {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Sync Timer Test</h1>
+        
+        <div id="status" class="disconnected">
+            Status: Disconnected
+        </div>
+        
+        <div class="section">
+            <h3>Create Session (Host)</h3>
+            <input type="text" id="hostName" placeholder="Host name" value="Test Host">
+            <input type="text" id="sessionName" placeholder="Session name" value="Test Session">
+            <button onclick="createSession()">Create Session</button>
+        </div>
+        
+        <div class="section">
+            <h3>Join Session (Participant)</h3>
+            <input type="text" id="participantName" placeholder="Participant name" value="Test Participant">
+            <input type="text" id="sessionCode" placeholder="Session code">
+            <button onclick="joinSession()">Join Session</button>
+        </div>
+        
+        <div class="section">
+            <h3>Timer Controls (Host Only)</h3>
+            <button onclick="startTimer()">Start</button>
+            <button onclick="pauseTimer()">Pause</button>
+            <button onclick="resetTimer()">Reset</button>
+            <button onclick="setTime(300)">Set 5 min</button>
+            <button onclick="setTime(600)">Set 10 min</button>
+        </div>
+        
+        <div class="section">
+            <h3>Current State</h3>
+            <div id="timerDisplay">00:00</div>
+            <div id="sessionInfo">No session</div>
+            <div id="connections">No connections</div>
+        </div>
+        
+        <div class="section">
+            <h3>Debug Log</h3>
+            <button onclick="clearLog()">Clear Log</button>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script src="sync-timer.js"></script>
+    <script>
+        let syncTimer = null;
+        
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${time}] ${message}<br>`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[${time}] ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function updateStatus(status, message) {
+            const statusEl = document.getElementById('status');
+            statusEl.className = status;
+            statusEl.textContent = `Status: ${message}`;
+        }
+        
+        function updateTimerDisplay(timerState) {
+            if (!timerState) return;
+            
+            const minutes = Math.floor(timerState.remainingSeconds / 60);
+            const seconds = timerState.remainingSeconds % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            document.getElementById('timerDisplay').textContent = display;
+            
+            const status = timerState.isRunning ? 'Running' : 
+                          timerState.isPaused ? 'Paused' : 'Stopped';
+            document.getElementById('timerDisplay').textContent += ` (${status})`;
+        }
+        
+        function updateSessionInfo(sessionData) {
+            if (!sessionData) return;
+            
+            document.getElementById('sessionInfo').textContent = 
+                `Session: ${sessionData.sessionName} (${sessionData.sessionId})`;
+        }
+        
+        function updateConnections(connections) {
+            const connectionsEl = document.getElementById('connections');
+            if (!connections || connections.length === 0) {
+                connectionsEl.textContent = 'No connections';
+                return;
+            }
+            
+            const connectionsList = connections.map(conn => 
+                `${conn.name} (${conn.type})`
+            ).join(', ');
+            
+            connectionsEl.textContent = `Connected: ${connectionsList}`;
+        }
+        
+        async function createSession() {
+            const hostName = document.getElementById('hostName').value.trim();
+            const sessionName = document.getElementById('sessionName').value.trim();
+            
+            if (!hostName || !sessionName) {
+                alert('Please enter host name and session name');
+                return;
+            }
+            
+            try {
+                log('Creating session...');
+                
+                if (!syncTimer) {
+                    syncTimer = new SyncTimer();
+                    setupSyncTimerEvents();
+                }
+                
+                const result = await syncTimer.createSession(hostName, sessionName);
+                log(`Session created: ${result.sessionId}`);
+                
+                // Auto-fill session code for testing
+                document.getElementById('sessionCode').value = result.sessionId;
+                
+            } catch (error) {
+                log(`Error creating session: ${error.message}`);
+            }
+        }
+        
+        async function joinSession() {
+            const participantName = document.getElementById('participantName').value.trim();
+            const sessionCode = document.getElementById('sessionCode').value.trim();
+            
+            if (!participantName || !sessionCode) {
+                alert('Please enter participant name and session code');
+                return;
+            }
+            
+            try {
+                log('Joining session...');
+                
+                if (!syncTimer) {
+                    syncTimer = new SyncTimer();
+                    setupSyncTimerEvents();
+                }
+                
+                await syncTimer.joinSession(sessionCode, participantName);
+                log(`Joined session: ${sessionCode}`);
+                
+            } catch (error) {
+                log(`Error joining session: ${error.message}`);
+            }
+        }
+        
+        function setupSyncTimerEvents() {
+            if (!syncTimer) return;
+            
+            syncTimer.on('connected', (data) => {
+                updateStatus('connected', `Connected to ${data.sessionId}`);
+                log('Connected to session');
+            });
+            
+            syncTimer.on('disconnected', (data) => {
+                updateStatus('disconnected', 'Disconnected');
+                log('Disconnected from session');
+            });
+            
+            syncTimer.on('error', (data) => {
+                updateStatus('error', `Error: ${data.message}`);
+                log(`Error: ${data.message}`);
+            });
+            
+            syncTimer.on('initialState', (data) => {
+                log('Received initial state');
+                updateTimerDisplay(data.timerState);
+                updateSessionInfo(data.sessionData);
+                updateConnections(data.connections);
+            });
+            
+            syncTimer.on('timerUpdate', (timerState) => {
+                log('Timer updated');
+                updateTimerDisplay(timerState);
+            });
+            
+            syncTimer.on('timerComplete', (timerState) => {
+                log('Timer completed!');
+                updateTimerDisplay(timerState);
+            });
+            
+            syncTimer.on('connectionUpdate', (connections) => {
+                log('Connections updated');
+                updateConnections(connections);
+            });
+        }
+        
+        function startTimer() {
+            if (syncTimer) {
+                syncTimer.startTimer();
+                log('Start timer command sent');
+            } else {
+                log('No sync timer connection');
+            }
+        }
+        
+        function pauseTimer() {
+            if (syncTimer) {
+                syncTimer.pauseTimer();
+                log('Pause timer command sent');
+            } else {
+                log('No sync timer connection');
+            }
+        }
+        
+        function resetTimer() {
+            if (syncTimer) {
+                syncTimer.resetTimer();
+                log('Reset timer command sent');
+            } else {
+                log('No sync timer connection');
+            }
+        }
+        
+        function setTime(seconds) {
+            if (syncTimer) {
+                syncTimer.setTime(seconds);
+                log(`Set time to ${seconds} seconds`);
+            } else {
+                log('No sync timer connection');
+            }
+        }
+        
+        // Initialize
+        log('Test page loaded');
+        log('Ready to test sync timer functionality');
+    </script>
+</body>
+</html> 

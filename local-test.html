@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Local Sync Timer Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .notice {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .notice h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: #f8f9fa;
+        }
+        .section.connected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .section.host {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+        .section.participant {
+            border-color: #17a2b8;
+            background: #d1ecf1;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 0;
+        }
+        .form-group {
+            margin: 1rem 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        button.success {
+            background: #27ae60;
+        }
+        button.success:hover {
+            background: #229954;
+        }
+        button.danger {
+            background: #e74c3c;
+        }
+        button.danger:hover {
+            background: #c0392b;
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-weight: bold;
+        }
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.error {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .timer-display {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border-radius: 15px;
+        }
+        .timer-status {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+        .connections-list {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        .user-item.host {
+            background: #fff3cd;
+        }
+        .user-item.participant {
+            background: #d1ecf1;
+        }
+        .user-icon {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .timer-display {
+                font-size: 2rem;
+            }
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 本地同步计时器测试</h1>
+            <p>使用BroadcastChannel API模拟多标签页同步</p>
+        </div>
+
+        <div class="notice">
+            <h3>📋 测试说明</h3>
+            <p><strong>本地测试模式</strong>：此页面使用BroadcastChannel API在同一浏览器的不同标签页之间模拟同步功能。</p>
+            <p><strong>测试步骤</strong>：</p>
+            <ol>
+                <li>在第一个标签页中创建会话（成为主持人）</li>
+                <li>复制此页面到新标签页，加入同一会话（成为参与者）</li>
+                <li>测试主持人控制，观察参与者同步</li>
+            </ol>
+        </div>
+
+        <div class="status" id="connectionStatus">
+            未连接 - 请创建或加入会话
+        </div>
+
+        <div class="timer-display" id="timerDisplay">
+            10:00
+            <div class="timer-status" id="timerStatus">准备开始</div>
+        </div>
+
+        <div class="section" id="createSection">
+            <h2>🎯 创建会话（主持人）</h2>
+            <div class="form-group">
+                <label for="hostName">主持人姓名</label>
+                <input type="text" id="hostName" value="本地测试主持人" placeholder="输入您的姓名">
+            </div>
+            <div class="form-group">
+                <label for="sessionName">会话名称</label>
+                <input type="text" id="sessionName" value="本地测试会话" placeholder="输入会话名称">
+            </div>
+            <button onclick="createSession()">创建会话</button>
+        </div>
+
+        <div class="section" id="joinSection">
+            <h2>👥 加入会话（参与者）</h2>
+            <div class="form-group">
+                <label for="participantName">参与者姓名</label>
+                <input type="text" id="participantName" value="本地测试参与者" placeholder="输入您的姓名">
+            </div>
+            <div class="form-group">
+                <label for="sessionCode">会话代码</label>
+                <input type="text" id="sessionCode" placeholder="输入会话代码">
+            </div>
+            <button onclick="joinSession()">加入会话</button>
+        </div>
+
+        <div class="section" id="controlSection" style="display: none;">
+            <h2>🎮 计时器控制</h2>
+            <div class="controls">
+                <button id="startBtn" onclick="startTimer()">开始</button>
+                <button id="pauseBtn" onclick="pauseTimer()">暂停</button>
+                <button id="resetBtn" onclick="resetTimer()">重置</button>
+                <button onclick="setTime(300)">设置5分钟</button>
+                <button onclick="setTime(600)">设置10分钟</button>
+                <button onclick="setTime(900)">设置15分钟</button>
+            </div>
+            <button class="danger" onclick="leaveSession()">离开会话</button>
+        </div>
+
+        <div class="section" id="infoSection" style="display: none;">
+            <h2>📊 会话信息</h2>
+            <div id="sessionInfo">
+                <p><strong>会话代码：</strong><span id="displaySessionCode">-</span></p>
+                <p><strong>我的角色：</strong><span id="myRole">-</span></p>
+                <p><strong>会话名称：</strong><span id="displaySessionName">-</span></p>
+            </div>
+            
+            <h3>👥 连接的用户</h3>
+            <div class="connections-list" id="connectionsList">
+                <div class="user-item">
+                    <span class="user-icon">👤</span>
+                    <span>暂无连接</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📝 调试日志</h2>
+            <button onclick="clearLog()">清空日志</button>
+            <div class="log" id="debugLog">等待操作...</div>
+        </div>
+    </div>
+
+    <script>
+        // 本地同步计时器类
+        class LocalSyncTimer {
+            constructor() {
+                this.sessionId = null;
+                this.userType = null; // 'host' or 'participant'
+                this.userName = null;
+                this.isConnected = false;
+                
+                // 计时器状态
+                this.timerState = {
+                    totalSeconds: 600,
+                    remainingSeconds: 600,
+                    isRunning: false,
+                    isPaused: false,
+                    startTime: null
+                };
+                
+                // 会话数据
+                this.sessionData = {
+                    sessionId: null,
+                    sessionName: null,
+                    hostName: null,
+                    participants: []
+                };
+                
+                // 计时器间隔
+                this.timerInterval = null;
+                
+                // BroadcastChannel for cross-tab communication
+                this.channel = null;
+                
+                this.log('LocalSyncTimer initialized');
+            }
+            
+            // 创建会话
+            async createSession(hostName, sessionName) {
+                const sessionId = this.generateSessionId();
+                
+                this.sessionId = sessionId;
+                this.userType = 'host';
+                this.userName = hostName;
+                this.isConnected = true;
+                
+                this.sessionData = {
+                    sessionId,
+                    sessionName,
+                    hostName,
+                    participants: [{
+                        name: hostName,
+                        type: 'host',
+                        id: 'host-' + Date.now()
+                    }]
+                };
+                
+                // 创建广播频道
+                this.channel = new BroadcastChannel(`timer-session-${sessionId}`);
+                this.channel.onmessage = (event) => this.handleMessage(event.data);
+                
+                // 保存到本地存储
+                localStorage.setItem(`session-${sessionId}`, JSON.stringify({
+                    sessionData: this.sessionData,
+                    timerState: this.timerState,
+                    createdAt: new Date().toISOString()
+                }));
+                
+                this.log(`Session created: ${sessionId}`);
+                this.updateUI();
+                
+                return {
+                    success: true,
+                    sessionId,
+                    sessionName
+                };
+            }
+            
+            // 加入会话
+            async joinSession(sessionCode, participantName) {
+                // 检查会话是否存在
+                const sessionKey = `session-${sessionCode}`;
+                const sessionData = localStorage.getItem(sessionKey);
+                
+                if (!sessionData) {
+                    throw new Error('Session not found');
+                }
+                
+                const session = JSON.parse(sessionData);
+                
+                this.sessionId = sessionCode;
+                this.userType = 'participant';
+                this.userName = participantName;
+                this.isConnected = true;
+                
+                this.sessionData = session.sessionData;
+                this.timerState = session.timerState;
+                
+                // 添加参与者到列表
+                const participantId = 'participant-' + Date.now();
+                this.sessionData.participants.push({
+                    name: participantName,
+                    type: 'participant',
+                    id: participantId
+                });
+                
+                // 更新存储
+                localStorage.setItem(sessionKey, JSON.stringify({
+                    sessionData: this.sessionData,
+                    timerState: this.timerState,
+                    createdAt: session.createdAt
+                }));
+                
+                // 创建广播频道
+                this.channel = new BroadcastChannel(`timer-session-${sessionCode}`);
+                this.channel.onmessage = (event) => this.handleMessage(event.data);
+                
+                // 广播加入消息
+                this.broadcast({
+                    type: 'USER_JOINED',
+                    user: {
+                        name: participantName,
+                        type: 'participant',
+                        id: participantId
+                    },
+                    sessionData: this.sessionData
+                });
+                
+                this.log(`Joined session: ${sessionCode}`);
+                this.updateUI();
+                
+                return {
+                    success: true,
+                    sessionId: sessionCode,
+                    sessionName: this.sessionData.sessionName
+                };
+            }
+            
+            // 处理广播消息
+            handleMessage(data) {
+                this.log(`Received: ${data.type}`);
+                
+                switch (data.type) {
+                    case 'TIMER_UPDATE':
+                        this.timerState = data.timerState;
+                        this.updateTimerDisplay();
+                        break;
+                        
+                    case 'TIMER_START':
+                        this.timerState = data.timerState;
+                        this.startLocalTimer();
+                        this.updateTimerDisplay();
+                        break;
+                        
+                    case 'TIMER_PAUSE':
+                        this.timerState = data.timerState;
+                        this.stopLocalTimer();
+                        this.updateTimerDisplay();
+                        break;
+                        
+                    case 'TIMER_RESET':
+                        this.timerState = data.timerState;
+                        this.stopLocalTimer();
+                        this.updateTimerDisplay();
+                        break;
+                        
+                    case 'TIME_SET':
+                        this.timerState = data.timerState;
+                        this.updateTimerDisplay();
+                        break;
+                        
+                    case 'USER_JOINED':
+                        this.sessionData = data.sessionData;
+                        this.updateConnectionsList();
+                        break;
+                        
+                    case 'USER_LEFT':
+                        this.sessionData = data.sessionData;
+                        this.updateConnectionsList();
+                        break;
+                }
+                
+                // 更新本地存储
+                this.saveSession();
+            }
+            
+            // 广播消息
+            broadcast(message) {
+                if (this.channel) {
+                    this.channel.postMessage(message);
+                }
+            }
+            
+            // 计时器控制方法
+            startTimer() {
+                if (this.userType !== 'host') {
+                    this.log('Only host can control timer');
+                    return false;
+                }
+                
+                this.timerState.isRunning = true;
+                this.timerState.isPaused = false;
+                this.timerState.startTime = Date.now();
+                
+                this.startLocalTimer();
+                
+                this.broadcast({
+                    type: 'TIMER_START',
+                    timerState: this.timerState
+                });
+                
+                this.updateTimerDisplay();
+                this.saveSession();
+                this.log('Timer started');
+                return true;
+            }
+            
+            pauseTimer() {
+                if (this.userType !== 'host') {
+                    this.log('Only host can control timer');
+                    return false;
+                }
+                
+                this.timerState.isRunning = false;
+                this.timerState.isPaused = true;
+                
+                this.stopLocalTimer();
+                
+                this.broadcast({
+                    type: 'TIMER_PAUSE',
+                    timerState: this.timerState
+                });
+                
+                this.updateTimerDisplay();
+                this.saveSession();
+                this.log('Timer paused');
+                return true;
+            }
+            
+            resetTimer() {
+                if (this.userType !== 'host') {
+                    this.log('Only host can control timer');
+                    return false;
+                }
+                
+                this.timerState.isRunning = false;
+                this.timerState.isPaused = false;
+                this.timerState.remainingSeconds = this.timerState.totalSeconds;
+                this.timerState.startTime = null;
+                
+                this.stopLocalTimer();
+                
+                this.broadcast({
+                    type: 'TIMER_RESET',
+                    timerState: this.timerState
+                });
+                
+                this.updateTimerDisplay();
+                this.saveSession();
+                this.log('Timer reset');
+                return true;
+            }
+            
+            setTime(seconds) {
+                if (this.userType !== 'host') {
+                    this.log('Only host can control timer');
+                    return false;
+                }
+                
+                if (this.timerState.isRunning) {
+                    this.log('Cannot set time while timer is running');
+                    return false;
+                }
+                
+                this.timerState.totalSeconds = seconds;
+                this.timerState.remainingSeconds = seconds;
+                
+                this.broadcast({
+                    type: 'TIME_SET',
+                    timerState: this.timerState
+                });
+                
+                this.updateTimerDisplay();
+                this.saveSession();
+                this.log(`Time set to ${seconds} seconds`);
+                return true;
+            }
+            
+            // 本地计时器管理
+            startLocalTimer() {
+                this.stopLocalTimer();
+                this.timerInterval = setInterval(() => {
+                    if (this.timerState.remainingSeconds > 0) {
+                        this.timerState.remainingSeconds--;
+                        this.updateTimerDisplay();
+                        
+                        // 只有主持人广播更新
+                        if (this.userType === 'host') {
+                            this.broadcast({
+                                type: 'TIMER_UPDATE',
+                                timerState: this.timerState
+                            });
+                        }
+                    } else {
+                        this.timerComplete();
+                    }
+                }, 1000);
+            }
+            
+            stopLocalTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+            }
+            
+            timerComplete() {
+                this.timerState.isRunning = false;
+                this.timerState.remainingSeconds = 0;
+                this.stopLocalTimer();
+                this.updateTimerDisplay();
+                this.log('Timer completed!');
+                
+                // 播放提醒音
+                this.playNotificationSound();
+            }
+            
+            // 离开会话
+            leaveSession() {
+                if (this.channel) {
+                    // 从参与者列表中移除自己
+                    this.sessionData.participants = this.sessionData.participants.filter(
+                        p => p.name !== this.userName
+                    );
+                    
+                    this.broadcast({
+                        type: 'USER_LEFT',
+                        sessionData: this.sessionData
+                    });
+                    
+                    this.channel.close();
+                    this.channel = null;
+                }
+                
+                this.stopLocalTimer();
+                this.isConnected = false;
+                this.sessionId = null;
+                this.userType = null;
+                this.userName = null;
+                
+                this.updateUI();
+                this.log('Left session');
+            }
+            
+            // UI更新方法
+            updateUI() {
+                const status = document.getElementById('connectionStatus');
+                const createSection = document.getElementById('createSection');
+                const joinSection = document.getElementById('joinSection');
+                const controlSection = document.getElementById('controlSection');
+                const infoSection = document.getElementById('infoSection');
+                
+                if (this.isConnected) {
+                    status.textContent = `已连接 - ${this.userType === 'host' ? '主持人' : '参与者'}: ${this.userName}`;
+                    status.className = 'status connected';
+                    
+                    createSection.style.display = 'none';
+                    joinSection.style.display = 'none';
+                    controlSection.style.display = 'block';
+                    infoSection.style.display = 'block';
+                    
+                    // 更新会话信息
+                    document.getElementById('displaySessionCode').textContent = this.sessionId;
+                    document.getElementById('myRole').textContent = this.userType === 'host' ? '主持人' : '参与者';
+                    document.getElementById('displaySessionName').textContent = this.sessionData.sessionName;
+                    
+                    // 禁用参与者控制
+                    if (this.userType === 'participant') {
+                        const buttons = controlSection.querySelectorAll('button:not(.danger)');
+                        buttons.forEach(btn => {
+                            btn.disabled = true;
+                            btn.title = '只有主持人可以控制计时器';
+                        });
+                        controlSection.classList.add('participant');
+                    } else {
+                        controlSection.classList.add('host');
+                    }
+                    
+                    this.updateConnectionsList();
+                } else {
+                    status.textContent = '未连接 - 请创建或加入会话';
+                    status.className = 'status disconnected';
+                    
+                    createSection.style.display = 'block';
+                    joinSection.style.display = 'block';
+                    controlSection.style.display = 'none';
+                    infoSection.style.display = 'none';
+                }
+            }
+            
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.timerState.remainingSeconds / 60);
+                const seconds = this.timerState.remainingSeconds % 60;
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('timerDisplay').innerHTML = `
+                    ${display}
+                    <div class="timer-status" id="timerStatus">${this.getTimerStatusText()}</div>
+                `;
+            }
+            
+            getTimerStatusText() {
+                if (this.timerState.isRunning) {
+                    return '运行中...';
+                } else if (this.timerState.isPaused) {
+                    return '已暂停';
+                } else if (this.timerState.remainingSeconds === 0) {
+                    return '已完成! 🎉';
+                } else {
+                    return '准备开始';
+                }
+            }
+            
+            updateConnectionsList() {
+                const list = document.getElementById('connectionsList');
+                list.innerHTML = '';
+                
+                this.sessionData.participants.forEach(participant => {
+                    const item = document.createElement('div');
+                    item.className = `user-item ${participant.type}`;
+                    item.innerHTML = `
+                        <span class="user-icon">${participant.type === 'host' ? '👑' : '👤'}</span>
+                        <span>${participant.name} (${participant.type === 'host' ? '主持人' : '参与者'})</span>
+                    `;
+                    list.appendChild(item);
+                });
+            }
+            
+            // 工具方法
+            generateSessionId() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let result = '';
+                for (let i = 0; i < 6; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            saveSession() {
+                if (this.sessionId) {
+                    localStorage.setItem(`session-${this.sessionId}`, JSON.stringify({
+                        sessionData: this.sessionData,
+                        timerState: this.timerState,
+                        createdAt: new Date().toISOString()
+                    }));
+                }
+            }
+            
+            playNotificationSound() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                } catch (e) {
+                    console.log('Could not play notification sound:', e);
+                }
+            }
+            
+            log(message) {
+                const logEl = document.getElementById('debugLog');
+                const time = new Date().toLocaleTimeString();
+                logEl.innerHTML += `[${time}] ${message}<br>`;
+                logEl.scrollTop = logEl.scrollHeight;
+                console.log(`[${time}] ${message}`);
+            }
+        }
+        
+        // 全局实例
+        let syncTimer = new LocalSyncTimer();
+        
+        // 页面控制函数
+        async function createSession() {
+            const hostName = document.getElementById('hostName').value.trim();
+            const sessionName = document.getElementById('sessionName').value.trim();
+            
+            if (!hostName || !sessionName) {
+                alert('请输入主持人姓名和会话名称');
+                return;
+            }
+            
+            try {
+                const result = await syncTimer.createSession(hostName, sessionName);
+                alert(`会话创建成功！\n会话代码: ${result.sessionId}\n\n请在新标签页中使用此代码加入会话进行测试。`);
+            } catch (error) {
+                alert('创建会话失败: ' + error.message);
+            }
+        }
+        
+        async function joinSession() {
+            const participantName = document.getElementById('participantName').value.trim();
+            const sessionCode = document.getElementById('sessionCode').value.trim().toUpperCase();
+            
+            if (!participantName || !sessionCode) {
+                alert('请输入参与者姓名和会话代码');
+                return;
+            }
+            
+            try {
+                await syncTimer.joinSession(sessionCode, participantName);
+                alert(`成功加入会话: ${sessionCode}`);
+            } catch (error) {
+                alert('加入会话失败: ' + error.message);
+            }
+        }
+        
+        function startTimer() {
+            syncTimer.startTimer();
+        }
+        
+        function pauseTimer() {
+            syncTimer.pauseTimer();
+        }
+        
+        function resetTimer() {
+            syncTimer.resetTimer();
+        }
+        
+        function setTime(seconds) {
+            syncTimer.setTime(seconds);
+        }
+        
+        function leaveSession() {
+            if (confirm('确定要离开会话吗？')) {
+                syncTimer.leaveSession();
+            }
+        }
+        
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+        
+        // 初始化
+        syncTimer.updateUI();
+        syncTimer.updateTimerDisplay();
+        syncTimer.log('Local sync timer test page loaded');
+        
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (syncTimer.isConnected) {
+                syncTimer.leaveSession();
+            }
+        });
+    </script>
+</body>
+</html> 

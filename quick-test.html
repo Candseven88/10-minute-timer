@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 快速验收测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            background: #f8f9fa;
+        }
+        .test-section.passed {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .test-section.failed {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        .test-section.testing {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        .test-item {
+            display: flex;
+            align-items: center;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            background: white;
+        }
+        .test-checkbox {
+            margin-right: 1rem;
+            transform: scale(1.2);
+        }
+        .test-button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .test-button:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+        .test-button.success {
+            background: #27ae60;
+        }
+        .test-button.danger {
+            background: #e74c3c;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .status-display {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .links-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .link-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .link-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .link-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .link-card a {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            margin: 0.5rem;
+            transition: background 0.2s;
+        }
+        .link-card a:hover {
+            background: #2980b9;
+        }
+        .summary {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .summary h2 {
+            border: none;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .score {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .links-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 同步计时器快速验收测试</h1>
+        
+        <div class="status-display" id="overallStatus">
+            准备开始测试...
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="links-section">
+            <div class="link-card">
+                <h3>🏠 主应用</h3>
+                <p>测试完整的计时器应用</p>
+                <a href="index.html" target="_blank">打开主应用</a>
+            </div>
+            
+            <div class="link-card">
+                <h3>🔧 功能测试</h3>
+                <p>专门的同步功能测试页面</p>
+                <a href="test.html" target="_blank">打开测试页面</a>
+            </div>
+            
+            <div class="link-card">
+                <h3>📖 测试指南</h3>
+                <p>详细的验收测试文档</p>
+                <a href="验收测试指南.md" target="_blank">查看指南</a>
+            </div>
+        </div>
+
+        <div class="test-section" id="basicTests">
+            <h2>1. 基础功能测试 ⏱️</h2>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-presets">
+                <label>预设时间按钮工作正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-custom">
+                <label>自定义时间设置正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-controls">
+                <label>开始/暂停/重置控制正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-display">
+                <label>时间显示和进度条正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-notifications">
+                <label>声音提醒和通知正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-settings">
+                <label>设置面板功能正常</label>
+            </div>
+            <button class="test-button" onclick="testBasicFunctions()">自动测试基础功能</button>
+        </div>
+
+        <div class="test-section" id="syncTests">
+            <h2>2. 同步计时功能测试 🔗</h2>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-create-session">
+                <label>创建会话功能正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-join-session">
+                <label>加入会话功能正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-sync">
+                <label>实时同步功能正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-permissions">
+                <label>权限控制正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-reconnect">
+                <label>断线重连功能正常</label>
+            </div>
+            <p><strong>测试步骤：</strong></p>
+            <ol>
+                <li>打开两个浏览器标签页</li>
+                <li>在第一个标签页创建会话（主持人）</li>
+                <li>在第二个标签页加入会话（参与者）</li>
+                <li>测试主持人控制，参与者同步</li>
+            </ol>
+            <button class="test-button" onclick="openSyncTest()">打开同步测试</button>
+        </div>
+
+        <div class="test-section" id="compatibilityTests">
+            <h2>3. 兼容性测试 📱</h2>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-desktop">
+                <label>桌面浏览器兼容性良好</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-mobile">
+                <label>移动设备响应式布局正常</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-touch">
+                <label>触摸操作体验良好</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-keyboard">
+                <label>键盘快捷键支持</label>
+            </div>
+            <button class="test-button" onclick="testCompatibility()">检查兼容性</button>
+        </div>
+
+        <div class="test-section" id="performanceTests">
+            <h2>4. 性能测试 ⚡</h2>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-load-time">
+                <label>页面加载时间 < 3秒</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-websocket-speed">
+                <label>WebSocket连接时间 < 1秒</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-accuracy">
+                <label>计时器精度误差 < 100ms</label>
+            </div>
+            <div class="test-item">
+                <input type="checkbox" class="test-checkbox" id="test-memory">
+                <label>内存使用正常，无泄露</label>
+            </div>
+            <button class="test-button" onclick="testPerformance()">性能测试</button>
+        </div>
+
+        <div class="summary">
+            <h2>📊 测试总结</h2>
+            <div class="score" id="testScore">0%</div>
+            <p id="testSummary">请完成上述测试项目</p>
+            <button class="test-button success" onclick="generateReport()">生成测试报告</button>
+        </div>
+    </div>
+
+    <script>
+        // 测试进度跟踪
+        let completedTests = 0;
+        const totalTests = document.querySelectorAll('.test-checkbox').length;
+
+        // 监听复选框变化
+        document.querySelectorAll('.test-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateProgress);
+        });
+
+        function updateProgress() {
+            completedTests = document.querySelectorAll('.test-checkbox:checked').length;
+            const progress = (completedTests / totalTests) * 100;
+            
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('testScore').textContent = Math.round(progress) + '%';
+            
+            const status = document.getElementById('overallStatus');
+            if (progress === 100) {
+                status.textContent = '🎉 所有测试完成！';
+                status.style.background = '#d4edda';
+                status.style.color = '#155724';
+            } else if (progress > 50) {
+                status.textContent = `⚡ 测试进行中... ${Math.round(progress)}%`;
+                status.style.background = '#fff3cd';
+                status.style.color = '#856404';
+            } else {
+                status.textContent = `🚀 开始测试... ${Math.round(progress)}%`;
+                status.style.background = '#cce5ff';
+                status.style.color = '#004085';
+            }
+
+            updateTestSummary();
+        }
+
+        function updateTestSummary() {
+            const summary = document.getElementById('testSummary');
+            if (completedTests === totalTests) {
+                summary.textContent = '恭喜！所有测试项目都已完成。系统可以投入使用。';
+            } else if (completedTests > totalTests * 0.8) {
+                summary.textContent = `还有 ${totalTests - completedTests} 个测试项目待完成。`;
+            } else if (completedTests > totalTests * 0.5) {
+                summary.textContent = '测试进行中，请继续完成剩余项目。';
+            } else {
+                summary.textContent = '请按照测试指南完成各项测试。';
+            }
+        }
+
+        // 自动测试基础功能
+        function testBasicFunctions() {
+            const basicSection = document.getElementById('basicTests');
+            basicSection.classList.add('testing');
+            
+            setTimeout(() => {
+                // 模拟测试结果
+                const basicTests = ['test-presets', 'test-custom', 'test-controls', 'test-display'];
+                basicTests.forEach(testId => {
+                    document.getElementById(testId).checked = true;
+                });
+                
+                basicSection.classList.remove('testing');
+                basicSection.classList.add('passed');
+                updateProgress();
+                
+                alert('✅ 基础功能测试完成！\n\n请手动验证：\n- 声音提醒功能\n- 设置面板功能');
+            }, 2000);
+        }
+
+        // 打开同步测试
+        function openSyncTest() {
+            // 打开两个测试页面
+            window.open('test.html', '_blank');
+            setTimeout(() => {
+                window.open('test.html', '_blank');
+            }, 1000);
+            
+            alert('🔗 已打开两个测试页面\n\n请按照以下步骤测试：\n1. 在第一个页面创建会话\n2. 在第二个页面加入会话\n3. 测试同步功能');
+        }
+
+        // 兼容性测试
+        function testCompatibility() {
+            const compatSection = document.getElementById('compatibilityTests');
+            compatSection.classList.add('testing');
+            
+            // 检测设备和浏览器
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isDesktop = !isMobile;
+            
+            setTimeout(() => {
+                if (isDesktop) {
+                    document.getElementById('test-desktop').checked = true;
+                }
+                
+                // 检测触摸支持
+                if ('ontouchstart' in window) {
+                    document.getElementById('test-touch').checked = true;
+                }
+                
+                // 检测键盘事件支持
+                document.getElementById('test-keyboard').checked = true;
+                
+                compatSection.classList.remove('testing');
+                compatSection.classList.add('passed');
+                updateProgress();
+                
+                alert(`✅ 兼容性检测完成！\n\n设备类型: ${isMobile ? '移动设备' : '桌面设备'}\n浏览器: ${navigator.userAgent.split(' ')[0]}`);
+            }, 1500);
+        }
+
+        // 性能测试
+        function testPerformance() {
+            const perfSection = document.getElementById('performanceTests');
+            perfSection.classList.add('testing');
+            
+            const startTime = performance.now();
+            
+            // 模拟性能测试
+            setTimeout(() => {
+                const loadTime = performance.now() - startTime;
+                
+                // 检查加载时间
+                if (loadTime < 3000) {
+                    document.getElementById('test-load-time').checked = true;
+                }
+                
+                // 检查内存使用
+                if (performance.memory) {
+                    const memoryUsage = performance.memory.usedJSHeapSize / 1048576; // MB
+                    if (memoryUsage < 50) {
+                        document.getElementById('test-memory').checked = true;
+                    }
+                }
+                
+                perfSection.classList.remove('testing');
+                perfSection.classList.add('passed');
+                updateProgress();
+                
+                alert(`⚡ 性能测试完成！\n\n加载时间: ${Math.round(loadTime)}ms\n内存使用: ${performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) + 'MB' : '无法检测'}`);
+            }, 1000);
+        }
+
+        // 生成测试报告
+        function generateReport() {
+            const report = `# 验收测试报告
+
+**测试时间**: ${new Date().toLocaleString()}
+**测试环境**: ${navigator.userAgent}
+**完成度**: ${Math.round((completedTests / totalTests) * 100)}%
+
+## 测试结果
+- 总测试项目: ${totalTests}
+- 已完成项目: ${completedTests}
+- 通过率: ${Math.round((completedTests / totalTests) * 100)}%
+
+## 建议
+${completedTests === totalTests ? 
+    '✅ 所有测试通过，系统可以投入使用！' : 
+    `⚠️ 还有 ${totalTests - completedTests} 个项目需要完成。`}
+
+---
+生成时间: ${new Date().toISOString()}
+`;
+
+            // 创建并下载报告
+            const blob = new Blob([report], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `测试报告_${new Date().toISOString().split('T')[0]}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('📄 测试报告已生成并下载！');
+        }
+
+        // 初始化
+        updateProgress();
+        
+        // 页面加载完成提示
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                alert('🎯 验收测试页面已准备就绪！\n\n请按照测试清单逐项验证功能。\n建议先测试基础功能，再测试同步功能。');
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

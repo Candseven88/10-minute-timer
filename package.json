@@ -1,21 +1,32 @@
 {
   "name": "10-minute-timer",
-  "version": "1.0.0",
-  "description": "A customizable countdown timer with multiple tasks and cloud sync",
+  "version": "2.1.0",
+  "description": "A simple and elegant countdown timer focused on productivity with synchronized timing capabilities",
   "main": "index.html",
   "scripts": {
-    "dev": "serve .",
-    "start": "serve .",
-    "deploy": "npx wrangler deploy",
-    "wrangler": "npx wrangler"
+    "dev": "wrangler pages dev . --compatibility-date=2024-09-11",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "wrangler pages deploy . --project-name=10-minute-timer",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy"
   },
-  "dependencies": {
-    "@cloudflare/kv-asset-handler": "^0.3.0",
-    "serve": "^14.0.0"
+  "keywords": [
+    "timer",
+    "countdown",
+    "productivity",
+    "focus",
+    "pomodoro",
+    "websocket",
+    "synchronized",
+    "collaborative"
+  ],
+  "author": "Timer App",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "."
   },
   "devDependencies": {
-    "wrangler": "^4.30.0"
-  },
-  "author": "",
-  "license": "MIT"
+    "wrangler": "^3.0.0"
+  }
 } 

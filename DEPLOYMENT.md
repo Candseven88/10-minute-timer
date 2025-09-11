@@ -1,147 +1,181 @@
-# 部署指南：Cloudflare Workers与自定义域名
+# 🚀 Cloudflare Pages + Workers 部署指南
 
-本指南将帮助您将倒计时应用部署到Cloudflare Workers，并绑定自定义域名(10-minute-timer.website)。
+本项目包含静态前端和WebSocket后端，需要同时部署到 Cloudflare Pages 和 Workers。
 
-## 前提条件
+## 🎯 部署方式
 
-1. 已注册Cloudflare账户
-2. 已购买域名(10-minute-timer.website)
-3. 已安装Node.js和npm
+### 方式一：通过 GitHub 连接（推荐）
 
-## 步骤1：安装Wrangler CLI
+1. **推送代码到 GitHub**
+   ```bash
+   git add .
+   git commit -m "Initial commit: Clean timer app"
+   git push origin main
+   ```
 
-Wrangler是Cloudflare Workers的命令行工具，用于开发和部署Workers应用。
+2. **在 Cloudflare Pages 创建项目**
+   - 登录 [Cloudflare Dashboard](https://dash.cloudflare.com)
+   - 进入 Pages 部分
+   - 点击 "Create a project"
+   - 选择 "Connect to Git"
+   - 选择你的 GitHub 仓库
 
-```bash
-npm install -g wrangler
-```
+3. **配置构建设置**
+   - **Project name**: `10-minute-timer`
+   - **Production branch**: `main`
+   - **Build command**: 留空（静态站点无需构建）
+   - **Build output directory**: `/`（根目录）
 
-## 步骤2：登录Cloudflare账户
+4. **部署**
+   - 点击 "Save and Deploy"
+   - 等待部署完成
 
-```bash
-wrangler login
-```
+### 方式二：使用 Wrangler CLI（推荐）
 
-这将打开浏览器窗口，要求您授权Wrangler访问您的Cloudflare账户。
+1. **安装依赖**
+   ```bash
+   npm install
+   ```
 
-## 步骤3：将域名添加到Cloudflare
+2. **登录 Cloudflare**
+   ```bash
+   npx wrangler login
+   ```
 
-1. 登录Cloudflare控制台(https://dash.cloudflare.com/)
-2. 点击"添加站点"
-3. 输入您的域名(10-minute-timer.website)
-4. 按照指示更改域名的DNS服务器
+3. **部署 Worker（WebSocket 后端）**
+   ```bash
+   npx wrangler deploy
+   ```
 
-> **注意**：更改DNS服务器可能需要24-48小时生效。
+4. **部署 Pages（前端）**
+   ```bash
+   npm run deploy
+   ```
 
-## 步骤4：获取Cloudflare账户ID和区域ID
+## 🔧 配置说明
 
-1. 在Cloudflare控制台，选择您的域名
-2. 在右侧边栏，找到"账户ID"和"区域ID"
-
-## 步骤5：创建KV命名空间
-
-KV命名空间用于存储应用状态。
-
-```bash
-wrangler kv:namespace create STATE_KV
-```
-
-这将输出一个命名空间ID，如：`b0453bbd0f5647c581adc4a1a27183af`
-
-## 步骤6：配置wrangler.toml
-
-确保您的wrangler.toml文件包含以下配置：
+### Durable Objects 配置
+项目使用 Durable Objects 来管理 WebSocket 会话状态，配置在 `wrangler.toml` 中：
 
 ```toml
-name = "10-minute-timer"
-workers_dev = true
-main = "workers-site/index.js"
-compatibility_date = "2025-08-18"
+[[durable_objects.bindings]]
+name = "TIMER_SESSIONS"
+class_name = "TimerSession"
 
-[site]
-bucket = "./"
-
-# 自定义域名配置
-routes = [
-  { pattern = "10-minute-timer.website/*", zone_name = "10-minute-timer.website" }
-]
-
-[[kv_namespaces]]
-binding = "STATE_KV"
-id = "您的KV命名空间ID" # 替换为步骤5中的ID
-
-# 环境变量配置
-[vars]
-ADMIN_TOKEN = "您的管理员令牌" # 可以自定义
+[[migrations]]
+tag = "v1"
+new_classes = ["TimerSession"]
 ```
 
-## 步骤7：部署应用
+### 环境变量
+- **前端**：不需要环境变量，所有配置存储在浏览器本地存储中
+- **后端**：使用 Durable Objects 绑定，无需额外环境变量
 
+### 自定义域名
+如需使用自定义域名，在 Cloudflare Pages 项目设置中添加：
+1. 进入项目的 "Custom domains" 设置
+2. 添加你的域名
+3. 按照指示配置 DNS 记录
+
+### HTTPS 和安全
+- Cloudflare Pages 自动提供 HTTPS
+- 自动获得 SSL/TLS 证书
+- CDN 全球加速
+- DDoS 防护
+
+## 📊 性能优化
+
+### 已实现的优化
+- ✅ 静态文件压缩
+- ✅ HTTP/2 支持
+- ✅ CDN 缓存
+- ✅ 响应式图片
+- ✅ 最小化 CSS/JS
+- ✅ WebSocket 长连接复用
+- ✅ Durable Objects 状态持久化
+- ✅ 自动重连和心跳检测
+
+### Cache 配置
+- **静态资源**：Cloudflare 自动处理缓存
+- **WebSocket 连接**：使用 Durable Objects 维持状态
+- **会话数据**：持久化存储，支持断线恢复
+
+## 🌐 访问地址
+
+部署完成后，你的应用将在以下地址可用：
+- **前端（Pages）**: `https://10-minute-timer.pages.dev`
+- **后端（Worker）**: `https://10-minute-timer.[your-subdomain].workers.dev`
+- **分支域名**: `https://[branch-name].10-minute-timer.pages.dev`
+
+> **注意**：WebSocket 连接会自动路由到正确的 Worker 端点，无需手动配置。
+
+## 🔄 更新部署
+
+### 自动部署
+每次推送到 `main` 分支都会自动触发部署。
+
+### 手动部署
 ```bash
+# 方式一：推送代码（自动部署 Pages）
+git add .
+git commit -m "Update timer app"
+git push origin main
+
+# 方式二：使用 Wrangler
+# 部署 Worker
+npx wrangler deploy
+
+# 部署 Pages
 npm run deploy
 ```
 
-或者直接使用wrangler：
+## 📋 部署检查清单
 
-```bash
-wrangler publish
-```
+- [ ] 代码推送到 GitHub
+- [ ] Cloudflare Pages 项目已创建
+- [ ] Cloudflare Worker 已部署
+- [ ] Durable Objects 绑定配置正确
+- [ ] 构建设置正确配置
+- [ ] 部署成功完成
+- [ ] 网站可正常访问
+- [ ] 本地计时功能正常工作
+- [ ] 同步计时功能正常工作
+- [ ] WebSocket 连接正常
+- [ ] 会话创建和加入功能正常
+- [ ] 移动端适配正常
+- [ ] 性能指标良好
 
-## 步骤8：配置自定义域名
+## 🚨 故障排除
 
-1. 在Cloudflare控制台，选择您的域名
-2. 点击"Workers Routes"选项卡
-3. 点击"添加路由"
-4. 输入路由模式：`10-minute-timer.website/*`
-5. 选择您的Worker：`10-minute-timer`
-6. 点击"保存"
+### 常见问题
 
-## 步骤9：验证部署
+**Q: Pages 部署失败怎么办？**
+A: 检查构建日志，确认所有文件都已正确推送。
 
-访问您的自定义域名：`https://10-minute-timer.website`
+**Q: Worker 部署失败怎么办？**
+A: 检查 `wrangler.toml` 配置，确认 Durable Objects 绑定正确。
 
-## 故障排除
+**Q: 网站无法访问？**
+A: 检查 DNS 设置和 Cloudflare Pages 状态页面。
 
-### DNS问题
+**Q: WebSocket 连接失败？**
+A: 确认 Worker 已正确部署，检查浏览器开发者工具的网络选项卡。
 
-如果域名无法访问，请检查DNS记录是否正确配置：
+**Q: 同步计时功能不工作？**
+A: 检查浏览器控制台是否有 WebSocket 连接错误，确认 Durable Objects 配置正确。
 
-1. 在Cloudflare控制台，选择您的域名
-2. 点击"DNS"选项卡
-3. 确保有一条A记录指向Cloudflare的IP地址
+**Q: 会话无法创建或加入？**
+A: 检查网络连接，确认 API 端点可正常访问。
 
-### Workers路由问题
+**Q: 移动端显示异常？**
+A: 检查 viewport meta 标签和 CSS 媒体查询。
 
-如果Workers路由不生效：
+### 联系支持
+如遇到技术问题，可以：
+- 查看 [Cloudflare Pages 文档](https://developers.cloudflare.com/pages/)
+- 在项目仓库提交 Issue
+- 联系 Cloudflare 支持
 
-1. 确保域名已完全激活在Cloudflare上
-2. 检查wrangler.toml中的routes配置
-3. 尝试清除浏览器缓存
+---
 
-### KV存储问题
-
-如果状态同步不工作：
-
-1. 确保KV命名空间ID正确
-2. 检查ADMIN_TOKEN是否正确设置
-
-## 更新应用
-
-要更新已部署的应用，只需修改代码后再次运行：
-
-```bash
-npm run deploy
-```
-
-## 监控和分析
-
-Cloudflare Workers提供了监控和分析功能：
-
-1. 在Cloudflare控制台，选择您的域名
-2. 点击"Workers"选项卡
-3. 选择您的Worker
-4. 查看"指标"选项卡
-
-## 自定义域名SSL证书
-
-Cloudflare自动为您的域名提供SSL证书，无需额外配置。 
+**部署成功后，你就拥有了一个高性能、全球可访问的倒计时器应用！** 🎉 
