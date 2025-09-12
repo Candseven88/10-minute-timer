@@ -1,0 +1,14 @@
+# Redirects for Cloudflare Pages
+
+# Redirect old timer paths to main
+/timer/* /
+/about /
+/privacy /
+/terms /
+
+# Force HTTPS
+http://10-minute-timer.pages.dev/* https://10-minute-timer.pages.dev/:splat 301!
+http://head.10-minute-timer.pages.dev/* https://head.10-minute-timer.pages.dev/:splat 301!
+
+# SPA fallback - redirect all non-asset requests to index.html
+/* /index.html 200 

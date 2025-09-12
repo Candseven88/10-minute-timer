@@ -1,6 +1,15 @@
 # 🕐 10分钟倒计时器
 
+[![Deploy to Cloudflare Pages](https://img.shields.io/badge/Deploy%20to-Cloudflare%20Pages-orange?style=for-the-badge&logo=cloudflare)](https://10-minute-timer.pages.dev)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/Candseven88/10-minute-timer)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
 一个简洁、现代化的在线倒计时器，专注于提高工作效率和专注度。
+
+## 🌐 在线访问
+
+- **主站**: [https://10-minute-timer.pages.dev](https://10-minute-timer.pages.dev)
+- **GitHub**: [https://github.com/Candseven88/10-minute-timer](https://github.com/Candseven88/10-minute-timer)
 
 ## ✨ 特性
 

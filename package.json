@@ -24,8 +24,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "."
+    "url": "https://github.com/Candseven88/10-minute-timer.git"
   },
+  "homepage": "https://10-minute-timer.pages.dev",
   "devDependencies": {
     "wrangler": "^3.0.0"
   }
