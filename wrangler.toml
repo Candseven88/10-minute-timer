@@ -1,15 +1,10 @@
 name = "10-minute-timer"
 compatibility_date = "2024-09-13"
 
-[env.production]
-name = "10-minute-timer"
-route = "10-minute-timer.website/*"
+# Cloudflare Pages configuration
+pages_build_output_dir = "dist"
 
 [build]
 command = "npm run build"
 cwd = "."
-watch_dir = "src"
-
-[[env.production.routes]]
-pattern = "10-minute-timer.website/*"
-zone_name = "10-minute-timer.website" 
+watch_dir = "src" 

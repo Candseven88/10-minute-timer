@@ -23,3 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# Build outputs
+.output
+.vercel
+.netlify
