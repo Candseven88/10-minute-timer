@@ -12,9 +12,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:production": "NODE_ENV=production vite build",
-    "deploy:preview": "npm run build && wrangler pages deploy dist",
-    "deploy:production": "npm run build:production && wrangler pages deploy dist --env production"
+    "build:production": "NODE_ENV=production vite build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
