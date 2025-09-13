@@ -1,27 +1,23 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { TimerState, TimerTask } from '../types/timer';
+import { TimerState, Timer } from '../types/timer';
 import { audioManager } from '../utils/audio';
 
 export const useTimer = (
-  tasks: TimerTask[],
+  timer: Timer,
   soundEnabled: boolean,
   flashEnabled: boolean,
-  onTaskComplete: (taskId: string) => void,
-  onAllTasksComplete: () => void
+  onTimerComplete: () => void
 ) => {
   const [timerState, setTimerState] = useState<TimerState>({
-    currentTime: 0,
-    totalTime: 0,
+    currentTime: timer.duration,
+    totalTime: timer.duration,
     isRunning: false,
     isPaused: false,
     isFlashing: false,
   });
 
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const currentTask = tasks[currentTaskIndex];
 
   const startFlashing = useCallback(() => {
     if (!flashEnabled) return;
@@ -42,33 +38,24 @@ export const useTimer = (
       const newTime = prev.currentTime - 1;
       
       if (newTime <= 0) {
-        // Task completed
+        // Timer completed - clear interval immediately
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        
         if (soundEnabled) {
           audioManager.playCompletionSound();
         }
         
-        onTaskComplete(currentTask?.id || '');
+        onTimerComplete();
         
-        // Move to next task
-        const nextTaskIndex = currentTaskIndex + 1;
-        if (nextTaskIndex < tasks.length) {
-          setCurrentTaskIndex(nextTaskIndex);
-          return {
-            ...prev,
-            currentTime: tasks[nextTaskIndex].duration,
-            totalTime: tasks[nextTaskIndex].duration,
-            isFlashing: false,
-          };
-        } else {
-          // All tasks completed
-          onAllTasksComplete();
-          return {
-            ...prev,
-            currentTime: 0,
-            isRunning: false,
-            isFlashing: false,
-          };
-        }
+        return {
+          ...prev,
+          currentTime: 0,
+          isRunning: false,
+          isFlashing: false,
+        };
       }
       
       // Flash warning in last 10 seconds
@@ -83,17 +70,15 @@ export const useTimer = (
       
       return { ...prev, currentTime: newTime };
     });
-  }, [currentTaskIndex, tasks, soundEnabled, onTaskComplete, onAllTasksComplete, currentTask?.id, startFlashing]);
+  }, [soundEnabled, onTimerComplete, startFlashing]);
 
   const startTimer = useCallback(() => {
-    if (!currentTask) return;
-    
     setTimerState(prev => ({
       ...prev,
       isRunning: true,
       isPaused: false,
-      currentTime: prev.currentTime || currentTask.duration,
-      totalTime: currentTask.duration,
+      currentTime: prev.currentTime || timer.duration,
+      totalTime: timer.duration,
     }));
 
     if (intervalRef.current) {
@@ -101,7 +86,7 @@ export const useTimer = (
     }
     
     intervalRef.current = setInterval(tick, 1000);
-  }, [currentTask, tick]);
+  }, [timer.duration, tick]);
 
   const pauseTimer = useCallback(() => {
     setTimerState(prev => ({ ...prev, isRunning: false, isPaused: true }));
@@ -114,8 +99,8 @@ export const useTimer = (
 
   const resetTimer = useCallback(() => {
     setTimerState({
-      currentTime: currentTask?.duration || 0,
-      totalTime: currentTask?.duration || 0,
+      currentTime: timer.duration,
+      totalTime: timer.duration,
       isRunning: false,
       isPaused: false,
       isFlashing: false,
@@ -125,7 +110,7 @@ export const useTimer = (
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, [currentTask]);
+  }, [timer.duration]);
 
   const addTime = useCallback((seconds: number) => {
     setTimerState(prev => ({
@@ -135,17 +120,22 @@ export const useTimer = (
     }));
   }, []);
 
-  // Initialize timer when tasks change
+  const setTimerDuration = useCallback((duration: number) => {
+    setTimerState(prev => ({
+      ...prev,
+      currentTime: duration,
+      totalTime: duration,
+    }));
+  }, []);
+
+  // Initialize timer when timer object changes
   useEffect(() => {
-    if (tasks.length > 0 && currentTaskIndex < tasks.length) {
-      const task = tasks[currentTaskIndex];
-      setTimerState(prev => ({
-        ...prev,
-        currentTime: task.duration,
-        totalTime: task.duration,
-      }));
-    }
-  }, [tasks, currentTaskIndex]);
+    setTimerState(prev => ({
+      ...prev,
+      currentTime: timer.duration,
+      totalTime: timer.duration,
+    }));
+  }, [timer.duration]);
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -161,12 +151,10 @@ export const useTimer = (
 
   return {
     timerState,
-    currentTask,
-    currentTaskIndex,
-    totalTasks: tasks.length,
     startTimer,
     pauseTimer,
     resetTimer,
     addTime,
+    setTimerDuration,
   };
 };

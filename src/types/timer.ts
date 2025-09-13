@@ -6,6 +6,11 @@ export interface TimerTask {
   isCompleted?: boolean;
 }
 
+export interface Timer {
+  name: string;
+  duration: number; // in seconds
+}
+
 export interface TimerSettings {
   backgroundColor: string;
   backgroundType: 'solid' | 'gradient' | 'image';

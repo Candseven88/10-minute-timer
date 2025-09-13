@@ -1,16 +1,35 @@
 {
-  "name": "10 Minute Timer",
-  "short_name": "Timer",
-  "description": "Free online countdown timer for focus sessions, meetings, debates, and productivity",
+  "name": "10 Minute Timer - Free Online Countdown Timer",
+  "short_name": "10 Min Timer",
+  "description": "Free online countdown timer for focus sessions, meetings, debates, and productivity. Set timers from 1 to 60 minutes with beautiful animations.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4F46E5",
+  "background_color": "#1e293b",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait-primary",
   "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
     {
       "src": "/timer-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }
-  ]
+  ],
+  "categories": ["productivity", "utilities", "tools"],
+  "lang": "en-US",
+  "dir": "ltr"
 } 

@@ -1,5 +1,0 @@
-# Redirect www to non-www
-https://www.10-minute-timer.website/* https://10-minute-timer.website/:splat 301!
-
-# SPA fallback for React Router
-/* /index.html 200 
