@@ -11,18 +11,22 @@ function App() {
   const [settings, setSettings] = useState<TimerSettings>({
     backgroundColor: '#1e293b',
     backgroundType: 'gradient',
-    gradientFrom: '#8B5CF6',
-    gradientTo: '#EC4899',
+    gradientFrom: '#4F46E5',
+    gradientTo: '#06B6D4',
     logoPosition: 'top-left',
-    title: 'Countdown Timer',
+    title: '10 Minute Timer',
     subtitle: 'Focus on what matters most',
     soundEnabled: true,
     flashEnabled: true,
   });
 
   const [tasks, setTasks] = useState<TimerTask[]>([
-    { id: '1', name: 'Focus Session', duration: 1500 }, // 25 minutes
-    { id: '2', name: 'Break Time', duration: 300 },    // 5 minutes
+    { id: '1', name: '1 Minute', duration: 60 },
+    { id: '2', name: '5 Minutes', duration: 300 },
+    { id: '3', name: '10 Minutes', duration: 600 },
+    { id: '4', name: '15 Minutes', duration: 900 },
+    { id: '5', name: '20 Minutes', duration: 1200 },
+    { id: '6', name: '30 Minutes', duration: 1800 },
   ]);
 
   const [showSettings, setShowSettings] = useState(false);
