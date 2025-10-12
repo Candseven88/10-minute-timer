@@ -1,0 +1,482 @@
+/* Custom Styles - Modern Countdown Timer */
+
+/* Keyframes */
+@keyframes slideUp {
+    0% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-100%); opacity: 0; }
+}
+
+@keyframes scaleIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+}
+
+@keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+
+/* Flip Card Styles */
+.flip-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.flip-card-modern {
+    position: relative;
+    width: 5rem; /* 80px */
+    height: 6rem; /* 96px */
+    background: linear-gradient(145deg, #374151, #1f2937, #111827);
+    border-radius: 0.75rem;
+    border: 1px solid #374151;
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+    .flip-card-modern {
+        width: 6rem; /* 96px */
+        height: 7rem; /* 112px */
+    }
+}
+
+@media (min-width: 768px) {
+    .flip-card-modern {
+        width: 8rem; /* 128px */
+        height: 9rem; /* 144px */
+    }
+}
+
+.flip-card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), transparent);
+    border-radius: 0.75rem;
+    pointer-events: none;
+}
+
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 640px) {
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 1.875rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 2.5rem;
+    }
+}
+
+.flip-card-back {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+/* Animation states */
+.flip-card-modern.changing .flip-card-front {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.flip-card-modern.changing .flip-card-back {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.flip-card-modern.changing {
+    transform: scale(1.1);
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Timer states */
+.flip-card-modern.timer-warning {
+    animation: glow 1s ease-in-out infinite;
+}
+
+.flip-card-modern.timer-warning .flip-card-front,
+.flip-card-modern.timer-warning .flip-card-back {
+    color: #fbbf24;
+}
+
+.flip-card-modern.timer-critical {
+    animation: glow 0.5s ease-in-out infinite;
+}
+
+.flip-card-modern.timer-critical .flip-card-front,
+.flip-card-modern.timer-critical .flip-card-back {
+    color: #ef4444;
+}
+
+.flip-card-modern.timer-completed .flip-card-front,
+.flip-card-modern.timer-completed .flip-card-back {
+    color: #10b981;
+}
+
+.card-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(203, 213, 225);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+@media (max-width: 640px) {
+    .card-label {
+        font-size: 0.75rem;
+    }
+}
+
+/* Control Button Styles */
+.control-btn-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.control-btn-main:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.control-btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: rgb(51, 65, 85);
+    color: white;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.control-btn-secondary:hover {
+    background-color: rgb(71, 85, 105);
+    transform: scale(1.05);
+}
+
+.adjustment-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(51, 65, 85, 0.5);
+    color: white;
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.5rem;
+    backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.adjustment-btn:hover {
+    background-color: rgba(71, 85, 105, 0.5);
+    transform: scale(1.05);
+}
+
+/* Settings Panel Styles */
+.settings-panel.active {
+    transform: translateX(0);
+}
+
+.setting-section {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgb(51, 65, 85);
+}
+
+.setting-section:last-child {
+    border-bottom: none;
+}
+
+.setting-section-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.setting-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgb(203, 213, 225);
+    margin-bottom: 0.5rem;
+}
+
+.setting-select,
+.setting-text-input,
+.setting-number-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(51, 65, 85, 0.5);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.5rem;
+    color: white;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.setting-select:focus,
+.setting-text-input:focus,
+.setting-number-input:focus {
+    outline: none;
+    border-color: rgb(139, 92, 246);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+}
+
+.setting-number-input {
+    text-align: center;
+}
+
+.setting-color-input {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(71, 85, 105);
+    background: transparent;
+    cursor: pointer;
+}
+
+.setting-file-input {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: rgba(51, 65, 85, 0.3);
+    border: 1px dashed rgb(71, 85, 105);
+    border-radius: 0.5rem;
+    color: rgb(203, 213, 225);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.setting-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgb(203, 213, 225);
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.setting-checkbox input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: rgb(139, 92, 246);
+}
+
+.setting-range {
+    width: 100%;
+    height: 0.5rem;
+    background-color: rgba(51, 65, 85, 0.5);
+    border-radius: 0.25rem;
+    appearance: none;
+    cursor: pointer;
+}
+
+.setting-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: rgb(139, 92, 246);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Logo positioning */
+.logo-container.top-right {
+    top: 1rem;
+    right: 1rem;
+    left: auto;
+}
+
+.logo-container.bottom-left {
+    top: auto;
+    bottom: 1rem;
+    left: 1rem;
+}
+
+.logo-container.bottom-right {
+    top: auto;
+    bottom: 1rem;
+    left: auto;
+    right: 1rem;
+}
+
+.logo-container.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Task list styles */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: rgba(51, 65, 85, 0.3);
+    border: 1px solid rgb(71, 85, 105);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    background-color: rgba(71, 85, 105, 0.3);
+}
+
+.task-item.active {
+    border-color: rgb(139, 92, 246);
+    background-color: rgba(139, 92, 246, 0.1);
+}
+
+.task-details {
+    flex: 1;
+}
+
+.task-title {
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.task-duration {
+    color: rgb(203, 213, 225);
+    font-size: 0.75rem;
+}
+
+.task-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.task-action-btn {
+    padding: 0.25rem;
+    background: transparent;
+    border: none;
+    color: rgb(156, 163, 175);
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.task-action-btn:hover {
+    color: white;
+    background-color: rgba(71, 85, 105, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .settings-panel {
+        width: 100%;
+    }
+    
+    .flip-card-modern {
+        width: 4rem;
+        height: 5rem;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 1.25rem;
+    }
+    
+    .control-btn-main {
+        width: 3.5rem;
+        height: 3.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .control-btn-secondary {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* Smooth transitions for all elements */
+* {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(51, 65, 85, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+} 

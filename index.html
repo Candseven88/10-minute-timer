@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Countdown Timer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/custom-styles.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'wave': 'wave 2s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.4s ease-out',
+                        'glow': 'glow 2s ease-in-out infinite',
+                        'pulse-soft': 'pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'shimmer': 'shimmer 1.5s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="overflow-hidden">
+    <!-- Background Container -->
+    <div id="backgroundContainer" class="fixed inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-pink-600 transition-all duration-1000">
+        <!-- Background overlay for better text readability -->
+        <div id="backgroundOverlay" class="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
+    </div>
+
+    <!-- Logo Container -->
+    <div id="logoContainer" class="logo-container absolute top-4 left-4 z-30 hidden">
+        <img id="logoImage" src="" alt="Logo" class="w-16 h-16 sm:w-20 sm:h-20 object-contain drop-shadow-lg">
+    </div>
+
+    <!-- Settings Toggle Button -->
+    <button id="settingsBtn" class="fixed top-4 right-4 w-12 h-12 rounded-full bg-slate-800/80 hover:bg-slate-700/80 text-white backdrop-blur transition-all duration-200 hover:scale-105 z-30 flex items-center justify-center">
+        <i class="fas fa-cog text-lg"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="relative z-20 min-h-screen flex flex-col items-center justify-center p-4 space-y-12">
+        <!-- Timer Section -->
+        <div id="timerSection" class="text-center space-y-8 transition-all duration-300">
+            <!-- Title -->
+            <div id="timerTitle" class="timer-title">
+                <h1 id="titleText" class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 tracking-wide">Countdown Timer</h1>
+            </div>
+
+            <!-- Flip Cards -->
+            <div class="flex items-center justify-center space-x-4 sm:space-x-6">
+                <!-- Hours -->
+                <div class="flip-card-container">
+                    <div id="hoursFlip" class="flip-card-modern">
+                        <div class="flip-card-front">00</div>
+                        <div class="flip-card-back">00</div>
+                    </div>
+                    <span class="card-label">Hours</span>
+                </div>
+
+                <!-- Separator -->
+                <div class="text-white text-4xl sm:text-5xl md:text-6xl font-bold animate-pulse">:</div>
+
+                <!-- Minutes -->
+                <div class="flip-card-container">
+                    <div id="minutesFlip" class="flip-card-modern">
+                        <div class="flip-card-front">10</div>
+                        <div class="flip-card-back">10</div>
+                    </div>
+                    <span class="card-label">Minutes</span>
+                </div>
+
+                <!-- Separator -->
+                <div class="text-white text-4xl sm:text-5xl md:text-6xl font-bold animate-pulse">:</div>
+
+                <!-- Seconds -->
+                <div class="flip-card-container">
+                    <div id="secondsFlip" class="flip-card-modern">
+                        <div class="flip-card-front">00</div>
+                        <div class="flip-card-back">00</div>
+                    </div>
+                    <span class="card-label">Seconds</span>
+                </div>
+            </div>
+
+            <!-- Progress Bars -->
+            <div id="progressContainer" class="progress-container w-full max-w-2xl mx-auto mt-12">
+                <!-- Horizontal Progress Bar -->
+                <div id="horizontalProgress" class="space-y-2">
+                    <h3 class="text-lg font-semibold text-white">Progress</h3>
+                    <div class="relative h-4 bg-slate-800/50 rounded-full overflow-hidden backdrop-blur">
+                        <div id="progressFill" class="absolute left-0 top-0 h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                    </div>
+                    <div class="text-right text-sm text-slate-300">
+                        <span id="progressPercentage">0.0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tagline -->
+            <div id="timerTagline" class="timer-tagline">
+                <p id="taglineText" class="text-lg sm:text-xl text-slate-300 mt-8 max-w-2xl mx-auto leading-relaxed">Stay focused and productive!</p>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="flex flex-col items-center space-y-6">
+            <!-- Main Controls -->
+            <div class="flex items-center space-x-4">
+                <button id="startBtn" class="control-btn-main bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                    <i class="fas fa-play"></i>
+                </button>
+                
+                <button id="pauseBtn" class="control-btn-main bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 hidden">
+                    <i class="fas fa-pause"></i>
+                </button>
+                
+                <button id="resetBtn" class="control-btn-secondary">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+
+            <!-- Time Adjustment Buttons -->
+            <div id="timeAdjustments" class="flex items-center space-x-3">
+                <button id="minus5Min" class="adjustment-btn">
+                    <i class="fas fa-minus"></i>
+                    <span>5m</span>
+                </button>
+                <button id="minus1Min" class="adjustment-btn">
+                    <i class="fas fa-minus"></i>
+                    <span>1m</span>
+                </button>
+                <button id="plus1Min" class="adjustment-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>1m</span>
+                </button>
+                <button id="plus5Min" class="adjustment-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>5m</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-white">Settings</h2>
+                <button id="closeSettings" class="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Timer Settings -->
+            <div class="bg-slate-700/30 rounded-xl p-6 mb-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <i class="fas fa-clock text-purple-400 text-xl"></i>
+                    <h3 class="text-xl font-semibold text-white">Timer Settings</h3>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 items-center">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-slate-300">Hours:</label>
+                        <input id="timerHours" type="number" min="0" max="23" value="0" 
+                               class="w-16 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white text-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-slate-300">Minutes:</label>
+                        <input id="timerMinutes" type="number" min="0" max="59" value="10" 
+                               class="w-16 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white text-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-slate-300">Seconds:</label>
+                        <input id="timerSeconds" type="number" min="0" max="59" value="0" 
+                               class="w-16 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white text-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    
+                    <button id="setTimerBtn" class="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                        <i class="fas fa-clock text-sm"></i>
+                        <span>Set Timer</span>
+                    </button>
+                </div>
+                
+                <div id="timerDisplay" class="mt-3 text-xs text-slate-400">
+                    Total time: 10m 0s
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Background Settings -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-semibold text-white">Background</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex space-x-4">
+                            <button id="bgTypeSolid" class="px-4 py-2 rounded-lg transition-colors bg-slate-700 text-slate-300 hover:bg-slate-600">
+                                Solid Color
+                            </button>
+                            <button id="bgTypeGradient" class="px-4 py-2 rounded-lg transition-colors bg-purple-600 text-white">
+                                Gradient
+                            </button>
+                            <button id="bgTypeImage" class="px-4 py-2 rounded-lg transition-colors bg-slate-700 text-slate-300 hover:bg-slate-600">
+                                Image
+                            </button>
+                        </div>
+
+                        <!-- Solid Color Options -->
+                        <div id="solidColorOptions" class="hidden">
+                            <div class="grid grid-cols-3 gap-3">
+                                <button class="color-option h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background-color: #8B5CF6;" data-color="#8B5CF6" title="Purple"></button>
+                                <button class="color-option h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background-color: #3B82F6;" data-color="#3B82F6" title="Blue"></button>
+                                <button class="color-option h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background-color: #10B981;" data-color="#10B981" title="Green"></button>
+                                <button class="color-option h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background-color: #EF4444;" data-color="#EF4444" title="Red"></button>
+                                <button class="color-option h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background-color: #F59E0B;" data-color="#F59E0B" title="Yellow"></button>
+                                <button class="color-option h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background-color: #EC4899;" data-color="#EC4899" title="Pink"></button>
+                            </div>
+                        </div>
+
+                        <!-- Gradient Options -->
+                        <div id="gradientOptions" class="space-y-3">
+                            <button class="gradient-option w-full h-12 rounded-lg border-2 border-white scale-105 transition-all" style="background: linear-gradient(135deg, #8B5CF6, #EC4899);" data-from="#8B5CF6" data-to="#EC4899">
+                                <span class="text-white font-medium drop-shadow">Purple to Pink</span>
+                            </button>
+                            <button class="gradient-option w-full h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background: linear-gradient(135deg, #3B82F6, #06B6D4);" data-from="#3B82F6" data-to="#06B6D4">
+                                <span class="text-white font-medium drop-shadow">Blue to Cyan</span>
+                            </button>
+                            <button class="gradient-option w-full h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background: linear-gradient(135deg, #10B981, #3B82F6);" data-from="#10B981" data-to="#3B82F6">
+                                <span class="text-white font-medium drop-shadow">Green to Blue</span>
+                            </button>
+                            <button class="gradient-option w-full h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background: linear-gradient(135deg, #F59E0B, #EF4444);" data-from="#F59E0B" data-to="#EF4444">
+                                <span class="text-white font-medium drop-shadow">Orange to Red</span>
+                            </button>
+                            <button class="gradient-option w-full h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background: linear-gradient(135deg, #8B5CF6, #3B82F6);" data-from="#8B5CF6" data-to="#3B82F6">
+                                <span class="text-white font-medium drop-shadow">Purple to Blue</span>
+                            </button>
+                            <button class="gradient-option w-full h-12 rounded-lg border-2 border-transparent hover:scale-105 transition-all" style="background: linear-gradient(135deg, #EC4899, #F59E0B);" data-from="#EC4899" data-to="#F59E0B">
+                                <span class="text-white font-medium drop-shadow">Pink to Orange</span>
+                            </button>
+                        </div>
+
+                        <!-- Image Upload Options -->
+                        <div id="imageOptions" class="hidden space-y-4">
+                            <div class="flex items-center space-x-4">
+                                <label class="flex items-center space-x-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-pointer transition-colors">
+                                    <i class="fas fa-upload text-slate-300"></i>
+                                    <span class="text-slate-300">Upload Image</span>
+                                    <input type="file" id="bgImageUpload" accept="image/*" class="hidden">
+                                </label>
+                            </div>
+                            
+                            <div id="imagePreview" class="hidden w-full h-32 rounded-lg overflow-hidden">
+                                <img id="backgroundPreviewImg" src="" alt="Background preview" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo & Text Settings -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-semibold text-white">Logo & Text</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Logo</label>
+                            <div class="flex items-center space-x-4">
+                                <label class="flex items-center space-x-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-pointer transition-colors">
+                                    <i class="fas fa-upload text-slate-300"></i>
+                                    <span class="text-slate-300">Upload Logo</span>
+                                    <input type="file" id="logoUpload" accept="image/*" class="hidden">
+                                </label>
+                            </div>
+                            
+                            <div id="logoPreview" class="hidden mt-3 flex items-center space-x-4">
+                                <img id="logoPreviewImg" src="" alt="Logo preview" class="w-16 h-16 object-contain rounded-lg bg-slate-700">
+                                <select id="logoPosition" class="px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="top-left">Top Left</option>
+                                    <option value="top-right">Top Right</option>
+                                    <option value="bottom-left">Bottom Left</option>
+                                    <option value="bottom-right">Bottom Right</option>
+                                    <option value="center">Center</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Title</label>
+                            <input type="text" id="titleInput" value="Countdown Timer" class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Enter title">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Subtitle</label>
+                            <textarea id="subtitleInput" class="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 h-24 resize-none" placeholder="Enter subtitle">Stay focused and productive!</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio & Effects Settings -->
+            <div class="mt-8 pt-6 border-t border-slate-600">
+                <h3 class="text-xl font-semibold text-white mb-4">Audio & Effects</h3>
+                
+                <div class="flex flex-wrap gap-4">
+                    <button id="soundToggle" class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors bg-green-600 hover:bg-green-700 text-white">
+                        <i class="fas fa-volume-up"></i>
+                        <span>Sound Notifications</span>
+                    </button>
+                    
+                    <button id="flashToggle" class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors bg-yellow-600 hover:bg-yellow-700 text-white">
+                        <i class="fas fa-bolt"></i>
+                        <span>Flash Effects</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="mt-8 flex justify-end space-x-4">
+                <button id="cancelSettings" class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button id="saveSettings" class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Overlay -->
+    <div id="flashOverlay" class="fixed inset-0 bg-red-500/30 pointer-events-none z-40 hidden"></div>
+
+    <!-- Scripts -->
+    <script src="js/timer.js"></script>
+    <script src="js/customization.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Ensure DOM is loaded before initializing the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add a small delay to ensure all elements are fully rendered
+            setTimeout(() => {
+                window.countdownApp = new CountdownApp();
+            }, 100);
+        });
+    </script>
+</body>
+</html> 

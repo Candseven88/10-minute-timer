@@ -1,0 +1,695 @@
+/* Responsive Design Styles */
+
+/* Large Desktop */
+@media (min-width: 1400px) {
+    .timer-container {
+        max-width: 900px;
+        padding: 50px 40px;
+    }
+    
+    .timer-title h1 {
+        font-size: 3rem;
+    }
+    
+    .flip-container {
+        width: 140px;
+        height: 180px;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 4rem;
+    }
+    
+    .time-separator {
+        font-size: 5rem;
+    }
+}
+
+/* Standard Desktop */
+@media (max-width: 1199px) {
+    .timer-container {
+        max-width: 750px;
+        padding: 35px 25px;
+    }
+    
+    .timer-title h1 {
+        font-size: 2.2rem;
+    }
+}
+
+/* Tablet Landscape */
+@media (max-width: 991px) {
+    .settings-panel {
+        width: 350px;
+        right: -350px;
+    }
+    
+    .timer-container {
+        max-width: 650px;
+        padding: 30px 20px;
+    }
+    
+    .timer-title h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+    
+    .timer-display {
+        gap: 15px;
+        margin: 30px 0;
+    }
+    
+    .flip-container {
+        width: 100px;
+        height: 140px;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 3rem;
+    }
+    
+    .time-separator {
+        font-size: 3.5rem;
+        padding-top: 8px;
+    }
+    
+    .controls {
+        margin-top: 30px;
+        gap: 15px;
+    }
+    
+    .control-btn {
+        padding: 12px 25px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .main-container {
+        min-height: 100vh;
+        padding: 15px;
+    }
+    
+    .settings-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .settings-toggle-btn {
+        top: 15px;
+        right: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
+    .logo-container {
+        position: relative;
+        margin: 10px 0;
+        pointer-events: auto;
+    }
+    
+    .logo-container.top-left,
+    .logo-container.top-center,
+    .logo-container.top-right {
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        transform: none;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .logo-container.bottom-left,
+    .logo-container.bottom-center,
+    .logo-container.bottom-right {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        transform: none;
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .logo-image {
+        max-width: 120px;
+        max-height: 80px;
+    }
+    
+    .timer-container {
+        max-width: 100%;
+        backdrop-filter: blur(8px);
+        padding: 25px 15px;
+        margin: 10px 0;
+    }
+    
+    .timer-title h1 {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+    }
+    
+    .timer-display {
+        gap: 12px;
+        margin: 25px 0;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .flip-container {
+        width: 85px;
+        height: 115px;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 2.3rem;
+        border-radius: 12px;
+    }
+    
+    .time-separator {
+        font-size: 3rem;
+        padding-top: 5px;
+    }
+    
+    .time-unit label {
+        font-size: 0.8rem;
+    }
+    
+    .progress-circular {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .percentage-text {
+        font-size: 1rem;
+    }
+    
+    .timer-tagline p {
+        font-size: 1rem;
+    }
+    
+    .controls {
+        margin-top: 25px;
+        gap: 12px;
+    }
+    
+    .time-adjustments {
+        gap: 8px;
+    }
+    
+    .adjustment-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .main-controls {
+        gap: 12px;
+    }
+    
+    .control-btn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+    
+    .current-task {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    /* Modal adjustments for tablet */
+    .modal-content {
+        width: 95%;
+        max-width: 450px;
+    }
+    
+    .settings-content {
+        padding: 15px;
+    }
+    
+    .setting-group {
+        margin-bottom: 25px;
+    }
+}
+
+/* Mobile Landscape */
+@media (max-width: 667px) and (orientation: landscape) {
+    .timer-container {
+        padding: 20px 15px;
+    }
+    
+    .timer-title h1 {
+        font-size: 1.6rem;
+        margin-bottom: 10px;
+    }
+    
+    .timer-display {
+        margin: 20px 0;
+        gap: 10px;
+    }
+    
+    .flip-container {
+        width: 70px;
+        height: 95px;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 2rem;
+    }
+    
+    .time-separator {
+        font-size: 2.5rem;
+    }
+    
+    .controls {
+        margin-top: 20px;
+        gap: 10px;
+    }
+    
+    .timer-tagline {
+        margin: 15px 0;
+    }
+    
+    .timer-tagline p {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile Portrait */
+@media (max-width: 479px) {
+    .timer-container {
+        padding: 20px 12px;
+        border-radius: 15px;
+    }
+    
+    .timer-title h1 {
+        font-size: 1.5rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+    }
+    
+    .timer-display {
+        gap: 8px;
+        margin: 20px 0;
+    }
+    
+    .flip-container {
+        width: 65px;
+        height: 85px;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 1.8rem;
+        border-radius: 10px;
+    }
+    
+    .flip-card-front::after,
+    .flip-card-back::after {
+        border-radius: 8px;
+    }
+    
+    .time-separator {
+        font-size: 2.2rem;
+        padding-top: 3px;
+    }
+    
+    .time-unit label {
+        font-size: 0.7rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .progress-bar {
+        height: 6px;
+    }
+    
+    .progress-circular {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .percentage-text {
+        font-size: 0.9rem;
+    }
+    
+    .timer-tagline {
+        margin: 15px 0;
+    }
+    
+    .timer-tagline p {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .controls {
+        margin-top: 20px;
+        gap: 10px;
+    }
+    
+    .time-adjustments {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .adjustment-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        border-radius: 20px;
+    }
+    
+    .main-controls {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .control-btn {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        border-radius: 40px;
+    }
+    
+    .current-task {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+    
+    /* Settings adjustments for mobile */
+    .settings-toggle-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .settings-header {
+        padding: 15px;
+    }
+    
+    .settings-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .settings-content {
+        padding: 12px;
+    }
+    
+    .setting-group {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+    
+    .setting-group h4 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+    
+    .color-options input[type="color"] {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Modal adjustments for mobile */
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 15px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .duration-inputs {
+        gap: 8px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 360px) {
+    .timer-container {
+        padding: 15px 10px;
+    }
+    
+    .timer-title h1 {
+        font-size: 1.3rem;
+    }
+    
+    .flip-container {
+        width: 55px;
+        height: 75px;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        font-size: 1.5rem;
+    }
+    
+    .time-separator {
+        font-size: 2rem;
+    }
+    
+    .time-unit label {
+        font-size: 0.6rem;
+    }
+    
+    .progress-circular {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .percentage-text {
+        font-size: 0.8rem;
+    }
+    
+    .timer-tagline p {
+        font-size: 0.8rem;
+    }
+    
+    .adjustment-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+    
+    .control-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Landscape orientation specific */
+@media (orientation: landscape) and (max-height: 500px) {
+    .timer-container {
+        padding: 15px 20px;
+    }
+    
+    .timer-title h1 {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+    }
+    
+    .timer-display {
+        margin: 15px 0;
+    }
+    
+    .controls {
+        margin-top: 15px;
+    }
+    
+    .timer-tagline {
+        margin: 10px 0;
+    }
+    
+    .timer-tagline p {
+        font-size: 0.85rem;
+    }
+    
+    .progress-container {
+        margin: 15px 0;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .flip-card-front,
+    .flip-card-back {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .timer-title h1 {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .control-btn:hover,
+    .adjustment-btn:hover,
+    .btn:hover {
+        transform: none;
+    }
+    
+    .control-btn:active,
+    .adjustment-btn:active,
+    .btn:active {
+        transform: scale(0.95);
+    }
+    
+    .flip-container:hover {
+        transform: none;
+    }
+    
+    /* Increase touch targets */
+    .control-btn {
+        min-height: 44px;
+        min-width: 88px;
+    }
+    
+    .adjustment-btn {
+        min-height: 36px;
+        min-width: 60px;
+    }
+    
+    .settings-toggle-btn {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .close-btn {
+        min-width: 36px;
+        min-height: 36px;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .flip-card {
+        transition: none;
+    }
+    
+    .flip-card.flipping,
+    .flip-card.flip-down,
+    .flip-card.flip-up,
+    .flip-card.number-changing {
+        animation: none;
+    }
+    
+    .timer-title h1 {
+        animation: none;
+        background: #4ecdc4;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .background-container {
+        animation: none;
+    }
+    
+    .progress-fill {
+        animation: none;
+    }
+    
+    .time-separator {
+        animation: none;
+        opacity: 0.6;
+    }
+    
+    .flip-container.timer-active .flip-card-front,
+    .flip-container.timer-active .flip-card-back {
+        animation: none;
+    }
+    
+    .flip-container.timer-warning .flip-card-front,
+    .flip-container.timer-warning .flip-card-back {
+        animation: none;
+    }
+    
+    .flip-container.timer-critical .flip-card-front,
+    .flip-container.timer-critical .flip-card-back {
+        animation: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    /* Already optimized for dark theme */
+}
+
+/* Light mode adjustments if needed */
+@media (prefers-color-scheme: light) {
+    .background-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    }
+    
+    .background-overlay {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Print styles */
+@media print {
+    .settings-panel,
+    .settings-toggle-btn,
+    .controls,
+    .flash-overlay {
+        display: none !important;
+    }
+    
+    .timer-container {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+    }
+    
+    .timer-title h1 {
+        color: #000 !important;
+        background: none !important;
+        -webkit-text-fill-color: #000 !important;
+    }
+    
+    .flip-card-front,
+    .flip-card-back {
+        background: #fff !important;
+        color: #000 !important;
+        border: 1px solid #000 !important;
+    }
+} 
