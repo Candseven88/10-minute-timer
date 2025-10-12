@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://10-minute-timer.website/sitemap.xml
+ 
+# Crawl-delay for respectful crawling
+Crawl-delay: 1 
